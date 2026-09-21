@@ -4,7 +4,7 @@ export const noEncontrado = (arrayDeDatos) => {
 
     const indice = arrayDeDatos.findIndex((e) => e.id === id);
 
-    if (!indice) {
+    if (indice === -1) {
       return res.status(404).json({ error: `El id:${id} no existe.` });
     }
     req.elementoEncontrado = arrayDeDatos[indice];

@@ -1,4 +1,4 @@
-const stands = [
+export const stands = [
     {
         id: 1,
         nombre: "Artesanías de Belén",

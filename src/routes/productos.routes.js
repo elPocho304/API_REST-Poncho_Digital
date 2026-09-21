@@ -8,7 +8,7 @@ import {
     agregarProducto,
     actualizarProducto,
     eliminarProducto
-} from "../controllers/productos.constrollers.js";
+} from "../controllers/productos.controllers.js";
 
 const router = express.Router();
 
