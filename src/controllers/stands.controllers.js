@@ -26,18 +26,18 @@ export const obtenerTodosLosStads = (req, res) => {
         resultado = resultado.filter(stand => stand.longitud === Number(longitud));
     };
 
-    res.json(resultado);
+    res.status(200).json(resultado);
 
 }
 export const obtenerStandPorId = (req, res) => {
-    res.json(req.elementoEncontrado);
+    res.status(200).json(req.elementoEncontrado);
 }
-export const agregarStand = (req, res) => {
+export const agregarStand = (req, res, next) => {
     const { nombre, descripcion, pabellon, sector, estado, latitud, longitud } = req.body;
     const nuevoId = stands.length + 1;
 
     if(!nombre || !pabellon || !sector || !estado || !latitud || !longitud ){
-        return res.status(400).json({error: "El nombre, pabellon, sector, estado, latitud y longitud son datos obligatorios."});
+         return next(new BadRequest('Faltan datos obligatorios'))
     };
 
     const nuevoStand = {
@@ -52,14 +52,13 @@ export const agregarStand = (req, res) => {
     };
 
     productos.push(nuevoStand);
+    res.status(201).json(nuevoStand)
 }
-export const actualizarStand = (req, res) => {
+export const actualizarStand = (req, res, next) => {
   const { nombre, descripcion, pabellon, sector, estado, latitud, longitud } = req.body;
 
   if (!nombre || !descripcion || !pabellon || !sector || !estado || !latitud || !longitud) {
-    return res
-      .status(400)
-      .json({ error: "Para actualizar, todos los datos son obligatorios." });
+    return next(new BadRequest('Faltan datos obligatorios'))
   }
 
   const stand = req.elementoEncontrado;
@@ -73,12 +72,12 @@ export const actualizarStand = (req, res) => {
   stand.latitud = latitud;
   stand.longitud = longitud;
 
-  res.json(stand);
+  res.status(200).json(stand);
 };
 export const eliminarStand = (req, res) => {
   const posicion = req.elementoIndice;
 
   stands.splice(posicion, 1);
 
-  res.json({ message: "El stand se eliminó correctamente." });
+  res.status(204).json({ message: "El stand se eliminó correctamente." });
 };

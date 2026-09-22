@@ -1,4 +1,5 @@
 import { productos } from "../data/productos.js";
+import { BadRequest } from "../utils/error.js";
 
 export const obtenerTodosLosProductos = (req, res) => {
     const { nombre, descripcion, precio, categoria } = req.query;
@@ -17,18 +18,18 @@ export const obtenerTodosLosProductos = (req, res) => {
         resultado = resultado.filter(producto => producto.categoria.toLowerCase().includes(categoria.toLowerCase()));
     };
 
-    res.json(resultado);
+    res.status(200).json(resultado);
 
 }
 export const obtenerProductoPorId = (req, res) => {
-    res.json(req.elementoEncontrado);
+    res.status(200).json(req.elementoEncontrado);
 }
-export const agregarProducto = (req, res) => {
+export const agregarProducto = (req, res, next) => {
     const { nombre, descripcion, precio, categoria } = req.body;
     const nuevoId = productos.length + 1;
 
     if(!nombre || !precio || !categoria){
-        return res.status(400).json({error: "El nombre, precio y categoría son datos obligatorios."});
+        return next(new BadRequest('Faltan datos obligatorios'))
     };
 
     const nuevoProducto = {
@@ -40,14 +41,13 @@ export const agregarProducto = (req, res) => {
     };
 
     productos.push(nuevoProducto);
+    res.status(201).json(nuevoProducto)
 }
-export const actualizarProducto = (req, res) => {
+export const actualizarProducto = (req, res, next) => {
   const { nombre, descripcion, precio, categoria } = req.body;
 
   if (!nombre || !descripcion || !precio || !categoria) {
-    return res
-      .status(400)
-      .json({ error: "Para actualizar, todos los datos son obligatorios." });
+    return next(new BadRequest('Faltan datos obligatorios'))
   }
 
   const producto = req.elementoEncontrado;
@@ -58,12 +58,12 @@ export const actualizarProducto = (req, res) => {
   producto.precio = precio;
   producto.categoria = categoria;
 
-  res.json(producto);
+  res.status(200).json(producto);
 };
 export const eliminarProducto = (req, res) => {
   const posicion = req.elementoIndice;
 
   productos.splice(posicion, 1);
 
-  res.json({ message: "El producto se eliminó correctamente." });
+  res.status(204).json({ message: "El producto se eliminó correctamente." });
 };

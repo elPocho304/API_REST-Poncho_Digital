@@ -8,17 +8,17 @@ export const obtenerTodosLosRoles = (req, res) => {
         resultado = resultado.filter(rol => rol.nombre.toLowerCase().includes(nombre.toLowerCase()));
 
     }
-    res.json(resultado);
+    res.status(200).json(resultado);
 }
 export const obtenerRolPorId = (req, res) => {
-    res.json(req.elementoEncontrado);
+    res.status(200).json(req.elementoEncontrado);
 }
-export const agregarRol = (req, res) => {
+export const agregarRol = (req, res, next) => {
     const { nombre } = req.body;
     const nuevoId = roles.length + 1;
 
     if(!nombre){
-        return res.status(400).json({error: "El nombre del rol es un dato obligatorios."});
+        return next(new BadRequest('Faltan datos obligatorios'))
     };
 
     const nuevoRol = {
@@ -27,14 +27,13 @@ export const agregarRol = (req, res) => {
     };
 
     productos.push(nuevoRol);
+    res.status(201).json(nuevoRol)
 }
-export const actualizarRol = (req, res) => {
+export const actualizarRol = (req, res, next) => {
   const { nombre } = req.body;
 
   if (!nombre) {
-    return res
-      .status(400)
-      .json({ error: "Para actualizar, el nombre del rol es obligatorio." });
+     return next(new BadRequest('Faltan datos obligatorios'))
   }
 
   const rol = req.elementoEncontrado;
@@ -42,12 +41,12 @@ export const actualizarRol = (req, res) => {
   //reasigno los valores
   rol.nombre = nombre;
 
-  res.json(rol);
+  res.status(200).json(rol);
 };
 export const eliminarRol = (req, res) => {
   const posicion = req.elementoIndice;
 
   roles.splice(posicion, 1);
 
-  res.json({ message: "El rol se eliminó correctamente." });
+  res.status(204).json({ message: "El rol se eliminó correctamente." });
 };
