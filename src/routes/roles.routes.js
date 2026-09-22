@@ -1,7 +1,6 @@
 import express from "express";
 import { roles } from "../data/roles.js";
 import { validarId } from "../middlewares/validarId.js";
-import { noEncontrado } from "../middlewares/noEncontrado.js";
 import {
     obtenerTodosLosRoles,
     obtenerRolPorId,

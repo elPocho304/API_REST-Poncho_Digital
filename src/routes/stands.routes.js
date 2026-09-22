@@ -1,7 +1,6 @@
 import express from "express";
 import { stands } from "../data/stands.js";
 import { validarId } from "../middlewares/validarId.js";
-import { noEncontrado } from "../middlewares/noEncontrado.js";
 import {
     obtenerTodosLosStads,
     obtenerStandPorId,
@@ -9,7 +8,6 @@ import {
     actualizarStand,
     eliminarStand
 } from "../controllers/stands.controllers.js";
-import { roles } from "../data/roles.js";
 
 const router = express.Router();
 

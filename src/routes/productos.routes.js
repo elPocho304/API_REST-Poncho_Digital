@@ -1,7 +1,7 @@
 import express from "express";
 import { productos } from "../data/productos.js";
 import { validarId } from "../middlewares/validarId.js";
-import { noEncontrado } from "../middlewares/noEncontrado.js";
+
 import {
     obtenerTodosLosProductos,
     obtenerProductoPorId,
