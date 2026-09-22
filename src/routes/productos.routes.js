@@ -13,9 +13,9 @@ import {
 const router = express.Router();
 
 router.get("/", obtenerTodosLosProductos);
-router.get("/:id", validarId, noEncontrado(productos), obtenerProductoPorId);
+router.get("/:id", validarId(productos), obtenerProductoPorId);
 router.post("/", agregarProducto);
-router.put("/:id", validarId, noEncontrado(productos), actualizarProducto);
-router.delete("/:id", validarId, eliminarProducto);
+router.put("/:id", validarId(productos), actualizarProducto);
+router.delete("/:id", validarId(productos), eliminarProducto);
 
 export default router;

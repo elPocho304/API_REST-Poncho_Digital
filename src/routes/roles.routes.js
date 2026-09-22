@@ -13,9 +13,9 @@ import {
 const router = express.Router();
 
 router.get("/", obtenerTodosLosRoles);
-router.get("/:id", validarId, noEncontrado(roles), obtenerRolPorId);
+router.get("/:id", validarId(roles), obtenerRolPorId);
 router.post("/", agregarRol);
-router.put("/:id", validarId, noEncontrado(roles), actualizarRol);
-router.delete("/:id", validarId, eliminarRol);
+router.put("/:id", validarId(roles), actualizarRol);
+router.delete("/:id", validarId(roles), eliminarRol);
 
 export default router;

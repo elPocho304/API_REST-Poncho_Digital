@@ -9,13 +9,14 @@ import {
     actualizarStand,
     eliminarStand
 } from "../controllers/stands.controllers.js";
+import { roles } from "../data/roles.js";
 
 const router = express.Router();
 
 router.get("/", obtenerTodosLosStads);
-router.get("/:id", validarId, noEncontrado(stands), obtenerStandPorId);
+router.get("/:id", validarId(stands), obtenerStandPorId);
 router.post("/", agregarStand);
-router.put("/:id", validarId, noEncontrado(stands), actualizarStand);
-router.delete("/:id", validarId, eliminarStand);
+router.put("/:id", validarId(stands), actualizarStand);
+router.delete("/:id", validarId(stands), eliminarStand);
 
 export default router;
