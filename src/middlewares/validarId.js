@@ -1,20 +1,14 @@
 import { BadRequest, NotFound } from "../utils/error.js";
-export const validarId = (array) =>{
-  return (req, res, next) => {
-  const id = Number(req.params.id);
 
-  if (!Number.isInteger(id) || id <= 0) {
-    return next(new BadRequest("El id debe ser un numero entero positivo"))
-  }; 
+
+export const validarId = (req, res, next) =>{
   
-  const indice = array.findIndex((e) => e.id === id);
+  const { id }  = req.params.id;
+  const idNumero = Number(id);
 
-  if (indice === -1) {
-      return next(new NotFound(id));
+ if (isNaN(idNumero) || !Number.isInteger(idNumero) || idNumero <= 0) {
+        return next(new BadRequest("El ID enviado en los parámetros debe ser un número entero positivo."));
     }
 
-    req.elementoEncontrado = array[indice];
-    req.elementoIndice = indice;
-
-  next();
-}};
+    next();
+};

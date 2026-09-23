@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Artesano {
+  id Int @id @default(autoincrement())
+  nombre  String
+  dni Int
+  localidad String 
+  descripcion String
+  estado String
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  //1 artesano tiene muchos productos (1:N)
+  productos Producto[]
+
+  //1 artesano ocupa 1 stand (1:1)
+  //(?)Campo opcional por si un artesano no tiene stand
+  standId Int? @unique
+  stand Stand? @relation(fields: [standId], references: [id])
+
+  //1 artesano tiene 1 rol asignado (1:1)
+  rolId       Int
+  rol         Rol      @relation(fields: [rolId], references: [id])
+}
+
+model Administrador{
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  email     String   @unique
+  password  String 
+
+  //1 administrador tiene 1 rol asignado (1:1)
+  rolId     Int
+  rol       Rol      @relation(fields: [rolId], references: [id])
+}
+
+model Producto {
+  id Int @id @default(autoincrement())
+  nombre String
+  descripcion String
+  precio Int
+  categoria String
+
+  //El producto pertenece a 1 artesano
+  artesanoId Int
+  artesano Artesano @relation(fields: [artesanoId], references: [id])
+}
+
+model Stand {
+  id Int @id @default(autoincrement())
+  nombre String
+  descripcion String
+  pabellon String
+  sector String
+  estado String
+  latitud Float
+  longitud Float
+
+  artesano Artesano?
+}
+
+model Rol {
+  id Int @id @default(autoincrement())
+  nombre String
+
+  //1 rol puede ser asignado a muchos usuarios (1:N)
+  artesanos Artesano[]
+  administradores Administrador[]
+}

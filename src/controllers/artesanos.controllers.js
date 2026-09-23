@@ -1,76 +1,146 @@
-import { artesanos } from "../data/artesanos.js";
-import { BadRequest } from "../utils/error.js";
+import prisma from "../config/prisma.js";
+import { BadRequest, NotFound } from "../utils/error.js";
 
-export const obtenerTodosLosArtesanos = (req, res) => {
-	const { nombre, dni, localidad, descripcion, estado } = req.query;
+//OBTENER TODOS LOS ARTESANOS (+ filtro)
+export const obtenerTodosLosArtesanos = async (req, res, next) => {
+    try {
+        const { nombre, dni, localidad, descripcion, estado } = req.query;
 
-	let resultado = artesanos;
-	if (nombre) {
-		resultado = resultado.filter(artesano => artesano.nombre.toLowerCase().includes(nombre.toLowerCase()));
-	}
-	if (dni) {
-		resultado = resultado.filter(artesano => artesano.dni.includes(dni));
-	}
-	if (localidad) {
-		resultado = resultado.filter(artesano => artesano.localidad.toLowerCase().includes(localidad.toLowerCase()));
-	}
-	if (descripcion) {
-		resultado = resultado.filter(artesano => artesano.descripcion.toLowerCase().includes(descripcion.toLowerCase()));
-	}
-	if (estado) {
-		resultado = resultado.filter(artesano => artesano.estado.toLowerCase().includes(estado.toLowerCase()));
-	}
+        const where = {};
 
-	res.status(200).json(resultado);
+        if (nombre) {
+            where.nombre = { contains: nombre, mode: "insensitive" };
+        }
+        if (dni) {
+            where.dni = Number(dni);
+        }
+        if (localidad) {
+            where.localidad = { contains: localidad, mode: "insensitive" };
+        }
+        if (descripcion) {
+            where.descripcion = { contains: descripcion, mode: "insensitive" };
+        }
+        if (estado) {
+            where.estado = { contains: estado, mode: "insensitive" };
+        }
+
+        const artesanos = await prisma.artesano.findMany({
+            where,
+            include: {
+                productos: true,
+                stand: true,
+                rol: true
+            }
+        });
+
+        res.status(200).json(artesanos);
+    } catch (error) {
+        next(error);
+    }
 };
 
-export const obtenerArtesanoPorId = (req, res) => {
-	res.status(200).json(req.elementoEncontrado);
+//OBTENER ARTESANO POR ID
+export const obtenerArtesanoPorId = async (req, res, next) => {
+    try {
+        const id = Number(req.params.id);
+
+        const artesano = await prisma.artesano.findUnique({
+            where: { id },
+            include: {
+                productos: true,
+                stand: true,
+                rol: true
+            }
+        });
+
+        if (!artesano) {
+            throw new NotFound(id); // si no existe el id genera error 404
+        }
+
+        res.status(200).json(artesano);
+    } catch (error) {
+        next(error);
+    }
 };
 
-export const agregarArtesano = (req, res, next) => {
-	const { nombre, dni, localidad, descripcion, estado } = req.body;
-	const nuevoId = artesanos.length + 1;
+//AGREGAR UN ARTESANO
+export const agregarArtesano = async (req, res, next) => {
+    try {
+        const { nombre, dni, localidad, descripcion, estado, rolId, standId } = req.body;
 
-	if (!nombre || !dni || !localidad || !estado) {
-		return next(new BadRequest("Faltan datos obligatorios"));
-	}
+        if (!nombre || !dni || !localidad || !estado) {
+            throw new BadRequest("Faltan datos obligatorios: nombre, dni, localidad y estado");
+        }
 
-	const nuevoArtesano = {
-		id: nuevoId,
-		nombre,
-		dni,
-		localidad,
-		descripcion: descripcion || null,
-		estado
-	};
+        const nuevoArtesano = await prisma.artesano.create({
+            data: {
+                nombre,
+                dni: Number(dni),
+                localidad,
+                descripcion: descripcion || "",
+                estado,
+                rolId: rolId ? Number(rolId) : 2,
+                ...(standId && { standId: Number(standId) })
+            }
+        });
 
-	artesanos.push(nuevoArtesano);
-	res.status(201).json(nuevoArtesano);
+        res.status(201).json(nuevoArtesano);
+    } catch (error) {
+        next(error);
+    }
 };
 
-export const actualizarArtesano = (req, res, next) => {
-	const { nombre, dni, localidad, descripcion, estado } = req.body;
+//ACTUALIZAR UN ARTESANO
+export const actualizarArtesano = async (req, res, next) => {
+    try {
+        const id = Number(req.params.id);
+        const { nombre, dni, localidad, descripcion, estado, rolId, standId } = req.body;
 
-	if (!nombre || !dni || !localidad || !descripcion || !estado) {
-		return next(new BadRequest("Faltan datos obligatorios"));
-	}
+        if (!nombre || !dni || !localidad || !descripcion || !estado) {
+            throw new BadRequest("Faltan datos obligatorios para actualizar el artesano");
+        }
 
-	const artesano = req.elementoEncontrado;
+        // Se verifica si existe antes de actualizar
+        const existe = await prisma.artesano.findUnique({ where: { id } });
+        if (!existe) {
+            throw new NotFound(id);
+        }
 
-	artesano.nombre = nombre;
-	artesano.dni = dni;
-	artesano.localidad = localidad;
-	artesano.descripcion = descripcion;
-	artesano.estado = estado;
+        const artesanoActualizado = await prisma.artesano.update({
+            where: { id },
+            data: {
+                nombre,
+                dni: Number(dni),
+                localidad,
+                descripcion,
+                estado,
+                ...(rolId && { rolId: Number(rolId) }),
+                ...(standId && { standId: Number(standId) })
+            }
+        });
 
-	res.status(200).json(artesano);
+        res.status(200).json(artesanoActualizado);
+    } catch (error) {
+        next(error);
+    }
 };
 
-export const eliminarArtesano = (req, res) => {
-	const posicion = req.elementoIndice;
+//ELIMINAR UN ARTESANO
+export const eliminarArtesano = async (req, res, next) => {
+    try {
+        const id = Number(req.params.id);
 
-	artesanos.splice(posicion, 1);
+        const existe = await prisma.artesano.findUnique({ where: { id } });
+        if (!existe) {
+            throw new NotFound(id);
+        }
 
-	res.status(204).json({ message: "El artesano se eliminó correctamente." });
+        await prisma.artesano.delete({
+            where: { id }
+        });
+
+        res.status(200).json({ message: "El artesano se eliminó correctamente." });
+    } catch (error) {
+        next(error);
+    }
 };

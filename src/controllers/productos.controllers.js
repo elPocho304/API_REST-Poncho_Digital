@@ -1,69 +1,154 @@
-import { productos } from "../data/productos.js";
-import { BadRequest } from "../utils/error.js";
+import prisma from "../config/prisma.js"
+import { BadRequest, NotFound } from "../utils/error.js";
 
-export const obtenerTodosLosProductos = (req, res) => {
-    const { nombre, descripcion, precio, categoria } = req.query;
+//OBTENER TODOS LOS PRODUCTOS (+ filtros)
+export const obtenerTodosLosProductos = async (req, res, next) => {
+try {
+        const { nombre, categoria, precioMin, precioMax, artesanoId } = req.query;
 
-    let resultado = productos;
-    if(nombre){
-        resultado = resultado.filter(producto => producto.nombre.toLowerCase().includes(nombre.toLowerCase()));
-    };
-    if(descripcion){
-        resultado = resultado.filter(producto => producto.descripcion.toLowerCase().includes(descripcion.toLowerCase()));
-    };
-    if(precio){
-        resultado = resultado.filter(producto => producto.precio === Number(precio));
-    };
-    if(categoria){
-        resultado = resultado.filter(producto => producto.categoria.toLowerCase().includes(categoria.toLowerCase()));
-    };
+        const where = {};
 
-    res.status(200).json(resultado);
+        if (nombre) {
+            where.nombre = { contains: nombre, mode: "insensitive" };
+        }
+        if (categoria) {
+            where.categoria = { contains: categoria, mode: "insensitive" };
+        }
+        if (artesanoId) {
+            where.artesanoId = Number(artesanoId); // Para buscar todos los productos de un artesano específico
+        }
+        // Filtro de rango de precios usando gte (mayor o igual) y lte (menor o igual)
+        if (precioMin || precioMax) {
+            where.precio = {};
+            if (precioMin) where.precio.gte = Number(precioMin);
+            if (precioMax) where.precio.lte = Number(precioMax);
+        }
 
+        const productos = await prisma.producto.findMany({
+            where,
+            include: {
+                artesano: true // Trae los datos del artesano del producto
+            }
+        });
+
+        res.status(200).json(productos);
+    } catch (error) {
+        next(error);
+    }
 }
-export const obtenerProductoPorId = (req, res) => {
-    res.status(200).json(req.elementoEncontrado);
+
+//OBTENER PRODUCTO POR ID
+export const obtenerProductoPorId = async (req, res, next) => {
+   try {
+        const id = Number(req.params.id);
+
+        const producto = await prisma.producto.findUnique({
+            where: { id },
+            include: {
+                artesano: true
+            }
+        });
+
+        if (!producto) {
+            throw new NotFound(id);
+        }
+
+        res.status(200).json(producto);
+    } catch (error) {
+        next(error);
+    }
 }
-export const agregarProducto = (req, res, next) => {
-    const { nombre, descripcion, precio, categoria } = req.body;
-    const nuevoId = productos.length + 1;
 
-    if(!nombre || !precio || !categoria){
-        return next(new BadRequest('Faltan datos obligatorios'))
-    };
+//AGREGAR PRODUCOT
+export const agregarProducto = async (req, res, next) => {
+    try {
+        const { nombre, descripcion, precio, categoria, artesanoId } = req.body;
 
-    const nuevoProducto = {
-        id: nuevoId,
-        nombre: nombre,
-        descripcion: descripcion || null,
-        precio: precio,
-        categoria: categoria
-    };
+        // Validamos que vengan todos los campos, especialmente el artesanoId (clave foránea)
+        if (!nombre || !descripcion || !precio || !categoria || !artesanoId) {
+            throw new BadRequest("Faltan datos obligatorios, incluyendo el artesanoId");
+        }
 
-    productos.push(nuevoProducto);
-    res.status(201).json(nuevoProducto)
+        // Antes de crear el producto verificamos que el artesano exista
+        const artesanoExiste = await prisma.artesano.findUnique({
+            where: { id: Number(artesanoId) }
+        });
+
+        if (!artesanoExiste) {
+            throw new BadRequest(`No se puede crear el producto porque el artesano con ID ${artesanoId} no existe`);
+        }
+
+        const nuevoProducto = await prisma.producto.create({
+            data: {
+                nombre,
+                descripcion,
+                precio: Number(precio),
+                categoria,
+                artesanoId: Number(artesanoId)
+            }
+        });
+
+        res.status(201).json(nuevoProducto);
+    } catch (error) {
+        next(error);
+    }
 }
-export const actualizarProducto = (req, res, next) => {
-  const { nombre, descripcion, precio, categoria } = req.body;
 
-  if (!nombre || !descripcion || !precio || !categoria) {
-    return next(new BadRequest('Faltan datos obligatorios'))
-  }
+//ACTUALIZAR PRODUCTO
+export const actualizarProducto = async (req, res, next) => {
+try {
+        const id = Number(req.params.id);
+        const { nombre, descripcion, precio, categoria, artesanoId } = req.body;
 
-  const producto = req.elementoEncontrado;
+        if (!nombre || !descripcion || !precio || !categoria || !artesanoId) {
+            throw new BadRequest("Faltan datos obligatorios para actualizar el producto");
+        }
 
-  //reasigno los valores
-  producto.nombre = nombre;
-  producto.descripcion = descripcion;
-  producto.precio = precio;
-  producto.categoria = categoria;
+        // Verificamos si el producto existe
+        const existe = await prisma.producto.findUnique({ where: { id } });
+        if (!existe) {
+            throw new NotFound(id);
+        }
 
-  res.status(200).json(producto);
+        // Si cambian el artesanoId, verificamos que el nuevo artesano exista
+        if (Number(artesanoId) !== existe.artesanoId) {
+             const artesanoExiste = await prisma.artesano.findUnique({ where: { id: Number(artesanoId) }});
+             if (!artesanoExiste) {
+                 throw new BadRequest(`El nuevo artesano asignado (ID ${artesanoId}) no existe`);
+             }
+        }
+
+        const productoActualizado = await prisma.producto.update({
+            where: { id },
+            data: {
+                nombre,
+                descripcion,
+                precio: Number(precio),
+                categoria,
+                artesanoId: Number(artesanoId)
+            }
+        });
+
+        res.status(200).json(productoActualizado);
+    } catch (error) {
+        next(error);
+    }
 };
-export const eliminarProducto = (req, res) => {
-  const posicion = req.elementoIndice;
+export const eliminarProducto = async (req, res) => {
+    try {
+        const id = Number(req.params.id);
 
-  productos.splice(posicion, 1);
+        const existe = await prisma.producto.findUnique({ where: { id } });
+        if (!existe) {
+            throw new NotFound(id);
+        }
 
-  res.status(204).json({ message: "El producto se eliminó correctamente." });
+        await prisma.producto.delete({
+            where: { id }
+        });
+
+        res.status(200).json({ message: "El producto se eliminó correctamente." });
+    } catch (error) {
+        next(error);
+    }
 };

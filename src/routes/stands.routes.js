@@ -1,5 +1,4 @@
 import express from "express";
-import { stands } from "../data/stands.js";
 import { validarId } from "../middlewares/validarId.js";
 import {
     obtenerTodosLosStads,
@@ -12,9 +11,9 @@ import {
 const router = express.Router();
 
 router.get("/", obtenerTodosLosStads);
-router.get("/:id", validarId(stands), obtenerStandPorId);
+router.get("/:id", validarId, obtenerStandPorId);
 router.post("/", agregarStand);
-router.put("/:id", validarId(stands), actualizarStand);
-router.delete("/:id", validarId(stands), eliminarStand);
+router.put("/:id", validarId, actualizarStand);
+router.delete("/:id", validarId, eliminarStand);
 
 export default router;

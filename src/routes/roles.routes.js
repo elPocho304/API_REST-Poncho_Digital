@@ -1,5 +1,4 @@
 import express from "express";
-import { roles } from "../data/roles.js";
 import { validarId } from "../middlewares/validarId.js";
 import {
     obtenerTodosLosRoles,
@@ -12,9 +11,9 @@ import {
 const router = express.Router();
 
 router.get("/", obtenerTodosLosRoles);
-router.get("/:id", validarId(roles), obtenerRolPorId);
+router.get("/:id", validarId, obtenerRolPorId);
 router.post("/", agregarRol);
-router.put("/:id", validarId(roles), actualizarRol);
-router.delete("/:id", validarId(roles), eliminarRol);
+router.put("/:id", validarId, actualizarRol);
+router.delete("/:id", validarId, eliminarRol);
 
 export default router;
