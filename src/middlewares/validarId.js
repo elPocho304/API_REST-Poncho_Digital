@@ -3,7 +3,7 @@ import { BadRequest, NotFound } from "../utils/error.js";
 
 export const validarId = (req, res, next) =>{
   
-  const { id }  = req.params.id;
+  const { id }  = req.params;
   const idNumero = Number(id);
 
  if (isNaN(idNumero) || !Number.isInteger(idNumero) || idNumero <= 0) {

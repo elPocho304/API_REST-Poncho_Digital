@@ -1,7 +1,7 @@
 import express from "express";
 import { validarId } from "../middlewares/validarId.js";
 import {
-    obtenerTodosLosStads,
+    obtenerTodosLosStands,
     obtenerStandPorId,
     agregarStand,
     actualizarStand,
@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 
-router.get("/", obtenerTodosLosStads);
+router.get("/", obtenerTodosLosStands);
 router.get("/:id", validarId, obtenerStandPorId);
 router.post("/", agregarStand);
 router.put("/:id", validarId, actualizarStand);

@@ -74,7 +74,7 @@ model Stand {
 
 model Rol {
   id Int @id @default(autoincrement())
-  nombre String
+  nombre String @unique
 
   //1 rol puede ser asignado a muchos usuarios (1:N)
   artesanos Artesano[]
