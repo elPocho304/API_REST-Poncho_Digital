@@ -12,3 +12,184 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+//ENUMS
+
+enum RolUsuario {
+  ADMINISTRADOR
+  ARTESANO
+}
+
+enum EstadoSolicitud {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+  MODIFICACION_SOLICITADA
+}
+
+enum EstadoStand {
+  DISPONIBLE
+  OCUPADO
+  MANTENIMIENTO
+}
+
+// MODELOS
+
+model Usuario {
+  id           Int        @id @default(autoincrement())
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  rol          RolUsuario
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  // Relaciones
+  artesano             Artesano?
+  solicitudesEnviadas  SolicitudRegistro[] @relation("UsuarioPostula")
+  solicitudesResueltas SolicitudRegistro[] @relation("AdminResuelve")
+  consultas            RegistroConsulta[]
+
+  @@index([rol])
+  @@map("usuarios")
+}
+
+model SolicitudRegistro {
+  id                   Int             @id @default(autoincrement())
+  estado               EstadoSolicitud @default(PENDIENTE)
+  
+  // Postulante (Si se borra el usuario, se elimina su solicitud)
+  usuarioId            Int             @map("usuario_id")
+  usuario              Usuario         @relation("UsuarioPostula", fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  
+  nombreEmprendimiento String          @map("nombre_emprendimiento")
+  rubro                String
+  localidad            String
+  descripcion          String?
+  comentarioAdmin      String?         @map("comentario_admin")
+  fechaSolicitud       DateTime        @default(now()) @map("fecha_solicitud")
+  fechaResolucion      DateTime?       @map("fecha_resolucion")
+  
+  // Administrador que resolvió (Si se borra el admin, la solicitud no se pierde: SetNull)
+  resueltaPorId        Int?            @map("resuelta_por_id")
+  resueltaPor          Usuario?        @relation("AdminResuelve", fields: [resueltaPorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  artesano Artesano?
+
+  @@index([estado])
+  @@index([localidad])
+  @@index([rubro])
+  @@map("solicitud_registro")
+}
+
+model Artesano {
+  id                   Int       @id @default(autoincrement())
+  
+  usuarioId            Int       @unique @map("usuario_id")
+  usuario              Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  
+  // Solicitud de registro aprobada (Si se borra la solicitud, el artesano no se pierde: SetNull)
+  solicitudId          Int?      @unique @map("solicitud_id")
+  solicitud            SolicitudRegistro? @relation(fields: [solicitudId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  
+  nombreEmprendimiento String    @map("nombre_emprendimiento")
+  rubro                String
+  localidad            String
+  trayectoria          String?
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  productos    Producto[]
+  asignaciones AsignacionStand[]
+
+  @@index([localidad])
+  @@index([rubro])
+  @@map("artesanos")
+}
+
+model Producto {
+  id          Int      @id @default(autoincrement())
+  
+  artesanoId  Int      @map("artesano_id")
+  artesano    Artesano @relation(fields: [artesanoId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  
+  nombre      String
+  descripcion String?
+  // Precio con 2 decimales, máximo 10 dígitos en total
+  precio      Decimal  @db.Decimal(10, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([artesanoId])
+  @@map("productos")
+}
+
+model Pabellon {
+  id          Int      @id @default(autoincrement())
+  nombre      String   @unique
+  descripcion String?
+  
+  sectores    Sector[]
+
+  @@map("pabellones")
+}
+
+model Sector {
+  id         Int      @id @default(autoincrement())
+  nombre     String
+  
+  pabellonId Int      @map("pabellon_id")
+  pabellon   Pabellon @relation(fields: [pabellonId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  
+  stands     Stand[]
+
+  @@index([pabellonId])
+  @@map("sectores")
+}
+
+model Stand {
+  id       Int         @id @default(autoincrement())
+  numero   String      @unique
+  
+  sectorId Int         @map("sector_id")
+  sector   Sector      @relation(fields: [sectorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  
+  estado   EstadoStand @default(DISPONIBLE)
+
+  asignaciones AsignacionStand[]
+
+  @@index([sectorId])
+  @@index([estado])
+  @@map("stands")
+}
+
+model AsignacionStand {
+  id          Int       @id @default(autoincrement())
+  
+  artesanoId  Int       @map("artesano_id")
+  artesano    Artesano  @relation(fields: [artesanoId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  
+  standId     Int       @map("stand_id")
+  stand       Stand     @relation(fields: [standId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  
+  fechaInicio DateTime  @default(now()) @map("fecha_inicio")
+  fechaFin    DateTime? @map("fecha_fin")
+  activo      Boolean   @default(true)
+
+  @@index([artesanoId])
+  @@index([standId])
+  @@map("asignacion_stand")
+}
+
+model RegistroConsulta {
+  id              Int      @id @default(autoincrement())
+  
+  usuarioId       Int?     @map("usuario_id")
+  usuario         Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  
+  metodo String   @map("metodo_busqueda")
+  filtrosAplicados String? @map("filtros_aplicados")
+  endpoint String   @map("endpoint_consultado")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([usuarioId])
+  @@map("registro_consulta")
+}
