@@ -1,8 +1,9 @@
 import express from "express";
 import artesanosRoutes from "./routes/artesanos.routes.js";
 import productosRoutes from "./routes/productos.routes.js";
-import rolesRoutes from "./routes/roles.routes.js"
-import standsRoutes from "./routes/stands.routes.js"
+import rolesRoutes from "./routes/roles.routes.js";
+import standsRoutes from "./routes/stands.routes.js";
+import registroRoutes from "./routes/registro.routes.js";
 import { manejadorErrores } from './middlewares/manejadorErrores.js';
 import { rutaNoEncontrada } from "./middlewares/noEncontrado.js";
 
@@ -18,8 +19,9 @@ app.use("/productos", productosRoutes);
 app.use("/roles", rolesRoutes);
 app.use("/stands", standsRoutes);
 app.use("/artesanos", artesanosRoutes);
+app.use("/registro", registroRoutes);
 
-app.use(rutaNoEncontrada)
+app.use(rutaNoEncontrada);
 app.use(manejadorErrores);
 
 app.listen(PORT, () => {
