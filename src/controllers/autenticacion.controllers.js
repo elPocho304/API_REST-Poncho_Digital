@@ -1,4 +1,4 @@
-import { crearRegistro } from "../services/registro.services.js";
+import { crearRegistro } from "../services/autenticacion.services.js";
 
 export const registro = async (req, res, next) => {
     try {

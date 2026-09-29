@@ -3,7 +3,7 @@ import artesanosRoutes from "./routes/artesanos.routes.js";
 import productosRoutes from "./routes/productos.routes.js";
 import rolesRoutes from "./routes/roles.routes.js";
 import standsRoutes from "./routes/stands.routes.js";
-import registroRoutes from "./routes/registro.routes.js";
+import registroRoutes from "./routes/autenticacion.routes.js";
 import { manejadorErrores } from './middlewares/manejadorErrores.js';
 import { rutaNoEncontrada } from "./middlewares/noEncontrado.js";
 
