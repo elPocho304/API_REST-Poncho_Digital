@@ -1,9 +1,9 @@
 import express from "express";
-import { validacionRegistro } from "../middlewares/validarId.js";
-import { registro } from "../controllers/autenticacion.controllers.js";
+import { validacionRegistro, validarInicioSesion } from "../middlewares/autenticacion.js";
+import { registro, iniciarSesion } from "../controllers/autenticacion.controllers.js";
 
 const router = express.Router();
 
-router.post("/", validacionRegistro, registro);
-
+router.post("/registro", validacionRegistro, registro);
+router.post("/login", validarInicioSesion, iniciarSesion)
 export default router;

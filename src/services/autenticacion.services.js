@@ -1,6 +1,6 @@
 import prisma from "../config/prisma.js";
 import bcrypt from "bcrypt"
-import { BadRequest } from "../utils/error.js";
+import { AppError } from "../utils/error.js";
 
 const FACTOR_COSTO = 10;
 
@@ -12,7 +12,7 @@ export const crearRegistro = async (registroDto) => {
         }
     })
     if (usuarioExistente){
-        throw new BadRequest("El correo electronico ya existe")
+        throw new AppError("El correo electronico ya existe", 409)
     }
 
     const passwordHash = await bcrypt.hash(password,FACTOR_COSTO)
@@ -33,3 +33,23 @@ export const crearRegistro = async (registroDto) => {
     })
     return registro;
 };
+
+export const iniciarSesionService = async (usuarioDto) => {
+    const {emailDto, passwordDto} = usuarioDto;
+    const usuario = await prisma.usuario.findUnique({
+        where: {email : emailDto}
+    })
+    if (!usuario){
+        throw new AppError("No existe un usuario con ese email", 401)
+    }
+    const passwordValida = await bcrypt.compare(passwordDto, usuario.passwordHash)
+    if (!passwordValida) { 
+        throw new AppError ("Contraseña incorrecta", 401)
+    }
+    return {
+        id: usuario.id,
+        email: usuario.email,
+        rol: usuario.rol
+    };
+
+}
