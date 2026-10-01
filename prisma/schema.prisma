@@ -36,7 +36,7 @@ enum EstadoStand {
 // MODELOS
 
 model Usuario {
-  id           Int        @id @default(autoincrement())
+  id           String      @id @default(uuid()) @db.Uuid
   email        String     @unique
   passwordHash String     @map("password_hash")
   rol          RolUsuario
@@ -54,11 +54,11 @@ model Usuario {
 }
 
 model SolicitudRegistro {
-  id                   Int             @id @default(autoincrement())
+  id                   String          @id @default(uuid()) @db.Uuid
   estado               EstadoSolicitud @default(PENDIENTE)
   
   // Postulante (Si se borra el usuario, se elimina su solicitud)
-  usuarioId            Int             @map("usuario_id")
+  usuarioId            String          @db.Uuid @map("usuario_id")
   usuario              Usuario         @relation("UsuarioPostula", fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   
   nombreEmprendimiento String          @map("nombre_emprendimiento")
@@ -70,7 +70,7 @@ model SolicitudRegistro {
   fechaResolucion      DateTime?       @map("fecha_resolucion")
   
   // Administrador que resolvió (Si se borra el admin, la solicitud no se pierde: SetNull)
-  resueltaPorId        Int?            @map("resuelta_por_id")
+  resueltaPorId        String?         @db.Uuid @map("resuelta_por_id")
   resueltaPor          Usuario?        @relation("AdminResuelve", fields: [resueltaPorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   artesano Artesano?
@@ -82,13 +82,13 @@ model SolicitudRegistro {
 }
 
 model Artesano {
-  id                   Int       @id @default(autoincrement())
+  id                   String      @id @default(uuid()) @db.Uuid
   
-  usuarioId            Int       @unique @map("usuario_id")
+  usuarioId            String      @unique @db.Uuid @map("usuario_id")
   usuario              Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   
   // Solicitud de registro aprobada (Si se borra la solicitud, el artesano no se pierde: SetNull)
-  solicitudId          Int?      @unique @map("solicitud_id")
+  solicitudId          String?     @unique @db.Uuid @map("solicitud_id")
   solicitud            SolicitudRegistro? @relation(fields: [solicitudId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   
   nombreEmprendimiento String    @map("nombre_emprendimiento")
@@ -107,10 +107,10 @@ model Artesano {
 }
 
 model Producto {
-  id          Int      @id @default(autoincrement())
+  id          String      @id @default(uuid()) @db.Uuid
   
-  artesanoId  Int      @map("artesano_id")
-  artesano    Artesano @relation(fields: [artesanoId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  artesanoId  String      @db.Uuid @map("artesano_id")
+  artesano    Artesano    @relation(fields: [artesanoId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   
   nombre      String
   descripcion String?
@@ -123,7 +123,7 @@ model Producto {
 }
 
 model Pabellon {
-  id          Int      @id @default(autoincrement())
+  id          String      @id @default(uuid()) @db.Uuid
   nombre      String   @unique
   descripcion String?
   
@@ -133,10 +133,10 @@ model Pabellon {
 }
 
 model Sector {
-  id         Int      @id @default(autoincrement())
+  id         String      @id @default(uuid()) @db.Uuid
   nombre     String
   
-  pabellonId Int      @map("pabellon_id")
+  pabellonId String      @db.Uuid @map("pabellon_id")
   pabellon   Pabellon @relation(fields: [pabellonId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   
   stands     Stand[]
@@ -146,10 +146,10 @@ model Sector {
 }
 
 model Stand {
-  id       Int         @id @default(autoincrement())
+  id       String      @id @default(uuid()) @db.Uuid
   numero   String      @unique
   
-  sectorId Int         @map("sector_id")
+  sectorId String      @db.Uuid @map("sector_id")
   sector   Sector      @relation(fields: [sectorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   
   estado   EstadoStand @default(DISPONIBLE)
@@ -162,12 +162,12 @@ model Stand {
 }
 
 model AsignacionStand {
-  id          Int       @id @default(autoincrement())
+  id          String      @id @default(uuid()) @db.Uuid
   
-  artesanoId  Int       @map("artesano_id")
-  artesano    Artesano  @relation(fields: [artesanoId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  artesanoId  String      @db.Uuid @map("artesano_id")
+  artesano    Artesano    @relation(fields: [artesanoId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   
-  standId     Int       @map("stand_id")
+  standId     String      @db.Uuid @map("stand_id")
   stand       Stand     @relation(fields: [standId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   
   fechaInicio DateTime  @default(now()) @map("fecha_inicio")
@@ -180,9 +180,9 @@ model AsignacionStand {
 }
 
 model RegistroConsulta {
-  id              Int      @id @default(autoincrement())
+  id              String      @id @default(uuid()) @db.Uuid
   
-  usuarioId       Int?     @map("usuario_id")
+  usuarioId       String?     @db.Uuid @map("usuario_id")
   usuario         Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   
   metodo String   @map("metodo_busqueda")
