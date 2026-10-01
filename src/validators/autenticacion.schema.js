@@ -15,9 +15,14 @@ export const validarRegistro = z.object({
       })
   ),
 
-  passwordHash: z
+  password: z
     .string()
     .trim()
     .min(8, { message: "La contraseña debe tener al menos 8 caracteres." })
     .max(100, { message: "La contraseña no puede superar los 100 caracteres." })
+});
+
+export const inicioSesionShema = z.object({
+  email: z.email("el email no tiene un formato valido"),
+  password: z.string().min(1,"la contraseña es obligatoria")
 });
