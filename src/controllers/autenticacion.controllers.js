@@ -11,7 +11,7 @@ export const registro = async (req, res, next) => {
 
 export const iniciarSesion = async (req, res, next) => {
     try {
-        const usuario = iniciarSesionService(req.body);
+        const usuario = await iniciarSesionService(req.body);
         return res.status(201).json(usuario)
     } catch (error) {
         next(error);

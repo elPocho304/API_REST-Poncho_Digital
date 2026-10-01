@@ -35,14 +35,14 @@ export const crearRegistro = async (registroDto) => {
 };
 
 export const iniciarSesionService = async (usuarioDto) => {
-    const {emailDto, passwordDto} = usuarioDto;
+    const {email, password} = usuarioDto;
     const usuario = await prisma.usuario.findUnique({
-        where: {email : emailDto}
+        where: {email : email}
     })
     if (!usuario){
         throw new AppError("No existe un usuario con ese email", 401)
     }
-    const passwordValida = await bcrypt.compare(passwordDto, usuario.passwordHash)
+    const passwordValida = await bcrypt.compare(password, usuario.passwordHash)
     if (!passwordValida) { 
         throw new AppError ("Contraseña incorrecta", 401)
     }

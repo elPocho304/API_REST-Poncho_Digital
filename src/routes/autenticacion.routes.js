@@ -5,5 +5,5 @@ import { registro, iniciarSesion } from "../controllers/autenticacion.controller
 const router = express.Router();
 
 router.post("/registro", validacionRegistro, registro);
-router.post("/login", validarInicioSesion, iniciarSesion)
+router.post("/login", validarInicioSesion, iniciarSesion);
 export default router;
