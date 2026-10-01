@@ -1,4 +1,5 @@
 import { BadRequest, NotFound } from "../utils/error.js";
+import { validarRegistro } from "../validators/autenticacion.schema.js";
 export const validarId = (array) =>{
   return (req, res, next) => {
   const id = Number(req.params.id);
