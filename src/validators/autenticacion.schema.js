@@ -54,7 +54,7 @@ export const validarRegistro = z.object({
     .max(500, {
       message: "La descripción no puede superar los 500 caracteres.",
     })
-    .opcional(),
+    .optional(),
 });
 
 export const inicioSesionShema = z.object({

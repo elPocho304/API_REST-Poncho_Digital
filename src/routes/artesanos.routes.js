@@ -1,20 +1,25 @@
-import express from "express";
-import { artesanos } from "../data/artesanos.js";
-import { validarId } from "../middlewares/validarId.js";
+import { Router } from "express";
 import {
-	obtenerTodosLosArtesanos,
-	obtenerArtesanoPorId,
-	agregarArtesano,
-	actualizarArtesano,
-	eliminarArtesano
+	obtenerArtesanosController,
+  obtenerArtesanoPorIdController,
+  crearArtesanoController,
+  actualizarArtesanoController,
+  eliminarArtesanoController,
+  obtenerTodosLosArtesanosController,
 } from "../controllers/artesanos.controllers.js";
+import { 
+	validarCreacionArtesano,
+	validarActualizacionArtesano,
+	validarArtesanoParams,
+	validarIdArtesanoParam,
+ } from "../middlewares/artesanos.js";
 
-const router = express.Router();
+const router = Router();
 
-router.get("/", obtenerTodosLosArtesanos);
-router.get("/:id", validarId(artesanos), obtenerArtesanoPorId);
-router.post("/", agregarArtesano);
-router.put("/:id", validarId(artesanos), actualizarArtesano);
-router.delete("/:id", validarId(artesanos), eliminarArtesano);
+router.get("/", obtenerTodosLosArtesanosController);
+router.get("/:id", validarIdArtesanoParam, obtenerArtesanoPorIdController);
+router.post("/", validarCreacionArtesano, crearArtesanoController);
+router.patch("/:id", validarIdArtesanoParam, validarActualizacionArtesano, actualizarArtesanoController);
+router.delete("/:id", validarIdArtesanoParam, eliminarArtesanoController);
 
 export default router;
