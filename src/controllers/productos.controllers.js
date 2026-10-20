@@ -1,69 +1,58 @@
-import { productos } from "../data/productos.js";
+import {
+  obtenerProductosService,
+  obtenerProductoPorIdService,
+  crearProductoService,
+  actualizarProductoService,
+  eliminarProductoService,
+} from "../services/productos.services.js";
 import { BadRequest } from "../utils/error.js";
 
-export const obtenerTodosLosProductos = (req, res) => {
-    const { nombre, descripcion, precio, categoria } = req.query;
-
-    let resultado = productos;
-    if(nombre){
-        resultado = resultado.filter(producto => producto.nombre.toLowerCase().includes(nombre.toLowerCase()));
-    };
-    if(descripcion){
-        resultado = resultado.filter(producto => producto.descripcion.toLowerCase().includes(descripcion.toLowerCase()));
-    };
-    if(precio){
-        resultado = resultado.filter(producto => producto.precio === Number(precio));
-    };
-    if(categoria){
-        resultado = resultado.filter(producto => producto.categoria.toLowerCase().includes(categoria.toLowerCase()));
-    };
-
-    res.status(200).json(resultado);
-
+export const obtenerTodosLosProductosController = async (req, res, next) => {
+    try {
+const filtros = req.query;
+    const productos = await obtenerProductosService(filtros);
+    return res.status(200).json(productos);
+    }catch (error) {
+        next (error);
+    }
 }
-export const obtenerProductoPorId = (req, res) => {
-    res.status(200).json(req.elementoEncontrado);
-}
-export const agregarProducto = (req, res, next) => {
-    const { nombre, descripcion, precio, categoria } = req.body;
-    const nuevoId = productos.length + 1;
-
-    if(!nombre || !precio || !categoria){
-        return next(new BadRequest('Faltan datos obligatorios'))
-    };
-
-    const nuevoProducto = {
-        id: nuevoId,
-        nombre: nombre,
-        descripcion: descripcion || null,
-        precio: precio,
-        categoria: categoria
-    };
-
-    productos.push(nuevoProducto);
-    res.status(201).json(nuevoProducto)
-}
-export const actualizarProducto = (req, res, next) => {
-  const { nombre, descripcion, precio, categoria } = req.body;
-
-  if (!nombre || !descripcion || !precio || !categoria) {
-    return next(new BadRequest('Faltan datos obligatorios'))
+export const obtenerProductoPorIdController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const producto = await obtenerProductoPorIdService(id);
+    return res.status(200).json(producto);
+  } catch (error) {
+    next(error);
   }
+}
 
-  const producto = req.elementoEncontrado;
-
-  //reasigno los valores
-  producto.nombre = nombre;
-  producto.descripcion = descripcion;
-  producto.precio = precio;
-  producto.categoria = categoria;
-
-  res.status(200).json(producto);
+export const crearProductoController = async (req, res, next) => {
+  try {
+    const productoDto = req.body;
+    const nuevoProducto = await crearProductoService(productoDto);
+    return res.status(201).json(nuevoProducto);
+  } catch (error) {
+    next(error);
+  }
 };
-export const eliminarProducto = (req, res) => {
-  const posicion = req.elementoIndice;
 
-  productos.splice(posicion, 1);
+export const actualizarProductoController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const datosActualizacion = req.body;
+    const productoActualizado = await actualizarProductoService(id, datosActualizacion);
+    return res.status(200).json(productoActualizado);
+  } catch (error) {
+    next(error);
+  }
+};
 
-  res.status(204).json({ message: "El producto se eliminó correctamente." });
+export const eliminarProductoController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const resultado = await eliminarProductoService(id);
+    return res.status(200).json(resultado);
+  } catch (error) {
+    next(error);
+  }
 };

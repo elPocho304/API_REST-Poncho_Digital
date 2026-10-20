@@ -1,21 +1,24 @@
-import express from "express";
-import { productos } from "../data/productos.js";
-import { validarId } from "../middlewares/validarId.js";
-
+import {Router} from "express";
 import {
-    obtenerTodosLosProductos,
-    obtenerProductoPorId,
-    agregarProducto,
-    actualizarProducto,
-    eliminarProducto
+  obtenerProductosController,
+  obtenerProductoPorIdController,
+  crearProductoController,
+  actualizarProductoController,
+  eliminarProductoController,
 } from "../controllers/productos.controllers.js";
+import { 
+    validarCreacionProducto,
+    validarActualizacionProducto,
+    validarIdProductoParam,
+    validarId,
+} from "../middlewares/validarId.js";
 
-const router = express.Router();
+const router = Router();
 
-router.get("/", obtenerTodosLosProductos);
-router.get("/:id", validarId(productos), obtenerProductoPorId);
-router.post("/", agregarProducto);
-router.put("/:id", validarId(productos), actualizarProducto);
-router.delete("/:id", validarId(productos), eliminarProducto);
+router.get("/", obtenerProductosController);
+router.get("/:id", validarIdProductoParam, obtenerProductoPorIdController);
+router.post("/", validarCreacionProducto, crearProductoController);
+router.patch("/:id", validarIdProductoParam, validarActualizacionProducto, actualizarProductoController);
+router.delete("/:id", validarIdProductoParam, eliminarProductoController);
 
 export default router;
