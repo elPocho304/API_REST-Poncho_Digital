@@ -1,20 +1,23 @@
-import express from "express";
-import { stands } from "../data/stands.js";
-import { validarId } from "../middlewares/validarId.js";
+import { Router } from "express";
 import {
-    obtenerTodosLosStads,
-    obtenerStandPorId,
-    agregarStand,
-    actualizarStand,
-    eliminarStand
+  obtenerStandsController,
+  obtenerStandPorIdController,
+  crearStandController,
+  actualizarStandController,
+  eliminarStandController,
 } from "../controllers/stands.controllers.js";
+import {
+  validarCreacionStand,
+  validarActualizacionStand,
+  validarIdStandParam,
+} from "../middlewares/stands.js";
 
-const router = express.Router();
+const router = Router();
 
-router.get("/", obtenerTodosLosStads);
-router.get("/:id", validarId(stands), obtenerStandPorId);
-router.post("/", agregarStand);
-router.put("/:id", validarId(stands), actualizarStand);
-router.delete("/:id", validarId(stands), eliminarStand);
+router.get("/", obtenerStandsController);
+router.get("/:id", validarIdStandParam, obtenerStandPorIdController);
+router.post("/", validarCreacionStand, crearStandController);
+router.patch("/:id", validarIdStandParam, validarActualizacionStand, actualizarStandController);
+router.delete("/:id", validarIdStandParam, eliminarStandController);
 
 export default router;
