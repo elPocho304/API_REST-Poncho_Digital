@@ -1,9 +1,12 @@
 import { z } from "zod";
 
 export const crearProductoSchema = z.object({
-  artesanoId: z.string({
-    required_error: "El ID del artesano es obligatorio",
-  }).uuid({ message: "El ID del artesano debe ser un UUID válido" }),
+  artesanoId: z.uuid({
+    error: (issue) =>
+      issue.input === undefined
+        ? "El ID del artesano es obligatorio"
+        : "El ID del artesano debe ser un UUID válido",
+  }),
 
   nombre: z.string({
     required_error: "El nombre del producto es obligatorio",
@@ -22,7 +25,10 @@ export const actualizarProductoSchema = crearProductoSchema.partial().omit({
 });
 
 export const idProductoParamSchema = z.object({
-  id: z.string({
-    required_error: "El ID del producto es obligatorio en los parámetros",
-  }).uuid({ message: "El ID del producto debe ser un UUID válido" }),
+  id: z.uuid({
+    error: (issue) =>
+      issue.input === undefined
+        ? "El ID del producto es obligatorio en los parámetros"
+        : "El ID del producto debe ser un UUID válido",
+  }),
 });
