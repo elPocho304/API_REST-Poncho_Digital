@@ -24,7 +24,6 @@ export const crearRegistro = async (registroDto) => {
 
   const passwordHash = await bcrypt.hash(password, FACTOR_COSTO);
 
-  const rol = "ARTESANO";
 
   //usamos una transaccion para crear el usuario y su solicitud de registro
   const resultado = await prisma.$transaction(async (tx) => {
@@ -32,7 +31,7 @@ export const crearRegistro = async (registroDto) => {
       data: {
         email: email,
         passwordHash: passwordHash,
-        rol: rol,
+        rol: "PENDIENTE",
       },
     });
 
@@ -57,20 +56,6 @@ export const crearRegistro = async (registroDto) => {
   });
 
   return resultado;
-  // const registro = await prisma.usuario.create({
-  //     data: {
-  //         email: email,
-  //         passwordHash: passwordHash,
-  //         rol: rol
-  //     },
-  //     select: {
-  //         id: true,
-  //         email: true,
-  //         rol: true,
-  //         createdAt: true
-  //     }
-  // })
-  // return registro;
 };
 
 export const iniciarSesionService = async (usuarioDto) => {
