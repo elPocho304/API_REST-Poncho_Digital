@@ -2,6 +2,7 @@ import {
   crearStandSchema,
   actualizarStandSchema,
   idStandParamSchema,
+  consultarStandsSchema,
 } from "../validators/stands.schema.js";
 import { BadRequest } from "../utils/error.js";
 
@@ -38,5 +39,18 @@ export const validarIdStandParam = (req, res, next) => {
     return next(new BadRequest(mensajes));
   }
   req.params = resultado.data;
+  next();
+};
+
+export const validarConsultarStands = (req, res, next) => {
+  const resultado = consultarStandsSchema.safeParse(req.query);
+  if (!resultado.success) {
+    const mensajes = resultado.error.issues
+      .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+      .join(";");
+
+    return next(new BadRequest(mensajes));
+  }
+  req.query = resultado.data;
   next();
 };
