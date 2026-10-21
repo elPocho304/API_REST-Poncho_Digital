@@ -2,18 +2,28 @@ import prisma from "../config/prisma.js";
 import { AppError } from "../utils/error.js";
 
 export const obtenerStandsService = async (filtros = {}) => {
-  const { sectorId, estado, ordenEstado } = filtros;
+  const {
+    sectorId,
+    estado,
+    numero,
+    ordenPor = "numero",
+    orden = "asc",
+    ordenEstado,
+    pagina = 1,
+    limite = 10,
+  } = filtros;
+  const direccionOrden = (ordenEstado ?? orden).toLowerCase();
+  const campoOrden = ordenEstado ? "estado" : ordenPor;
 
   const stands = await prisma.stand.findMany({
     where: {
       ...(sectorId && { sectorId }),
       ...(estado && { estado }),
+      ...(numero && { numero: { contains: numero, mode: "insensitive" } }),
     },
-    ...(ordenEstado && {
-      orderBy: {
-        estado: ordenEstado.toLowerCase() === "desc" ? "desc" : "asc",
-      },
-    }),
+    orderBy: [{ [campoOrden]: direccionOrden }, { id: "asc" }],
+    skip: (pagina - 1) * limite,
+    take: limite,
     include: {
       sector: true, // Incluimos la información del sector relacionado
     },

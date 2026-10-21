@@ -2,6 +2,7 @@ import {
   crearProductoSchema,
   actualizarProductoSchema,
   idProductoParamSchema,
+  consultarProductosSchema,
 } from "../validators/productos.schema.js";
 import { BadRequest } from "../utils/error.js";
 
@@ -38,5 +39,17 @@ export const validarIdProductoParam = (req, res, next) => {
     return next(new BadRequest(mensajes));
   }
   req.params = resultado.data;
+  next();
+};
+
+export const validarConsultaProductos = (req, res, next) => {
+  const resultado = consultarProductosSchema.safeParse(req.query);
+  if (!resultado.success) {
+    const mensajes = resultado.error.issues
+      .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+      .join(";");
+    return next(new BadRequest(mensajes));
+  }
+  req.productoConsulta = resultado.data;
   next();
 };

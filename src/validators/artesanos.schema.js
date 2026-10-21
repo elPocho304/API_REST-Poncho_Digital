@@ -43,3 +43,16 @@ export const idArtesanoParamSchema = z.object({
         : "El ID del artesano debe ser un UUID válido",
   }),
 });
+
+//validamos las consultas
+export const artesanoQuerySchema = z.object({
+  rubro: z.string().optional(),
+  localidad: z.string().optional(),
+  nombreEmprendimiento: z.string().optional(),
+  ordenPor: z
+    .enum(["nombreEmprendimiento", "rubro", "localidad", "createdAt"])
+    .default("nombreEmprendimiento"),
+  orden: z.enum(["asc", "desc"]).default("asc"),
+  pagina: z.coerce.number().int().min(1).default(1),
+  limite: z.coerce.number().int().min(1).max(100).default(10),
+});

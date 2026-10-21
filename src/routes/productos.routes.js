@@ -10,14 +10,15 @@ import {
     validarCreacionProducto,
     validarActualizacionProducto,
     validarIdProductoParam,
+    validarConsultaProductos,
 } from "../middlewares/productos.js";
 
 const router = Router();
 
-router.get("/", obtenerTodosLosProductosController);
-router.get("/:id", validarIdProductoParam, obtenerProductoPorIdController);
-router.post("/", validarCreacionProducto, crearProductoController);
-router.patch("/:id", validarIdProductoParam, validarActualizacionProducto, actualizarProductoController);
-router.delete("/:id", validarIdProductoParam, eliminarProductoController);
+router.get("/obtener", validarConsultaProductos, obtenerTodosLosProductosController);
+router.get("/obetenerPorId/:id", validarIdProductoParam, obtenerProductoPorIdController);
+router.post("/agregar", validarCreacionProducto, crearProductoController);
+router.patch("/actualizar/:id", validarIdProductoParam, validarActualizacionProducto, actualizarProductoController);
+router.delete("/eliminar/:id", validarIdProductoParam, eliminarProductoController);
 
 export default router;

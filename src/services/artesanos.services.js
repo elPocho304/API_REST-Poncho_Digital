@@ -3,13 +3,30 @@ import { AppError } from "../utils/error.js";
 
 // Obtener todos los artesanos (con opción de filtros por rubro o localidad)
 export const obtenerArtesanosService = async (filtros = {}) => {
-  const { rubro, localidad } = filtros;
+  const {
+    rubro,
+    localidad,
+    nombreEmprendimiento,
+    ordenPor,
+    orden,
+    pagina,
+    limite,
+  } = filtros;
 
   const artesanos = await prisma.artesano.findMany({
     where: {
       ...(rubro && { rubro: { contains: rubro, mode: "insensitive" } }),
       ...(localidad && { localidad: { contains: localidad, mode: "insensitive" } }),
+      ...(nombreEmprendimiento && {
+        nombreEmprendimiento: {
+          contains: nombreEmprendimiento,
+          mode: "insensitive",
+        },
+      }),
     },
+    orderBy: { [ordenPor]: orden },
+    skip: (pagina - 1) * limite,
+    take: limite,
     include: {
       productos: true, // Incluye los productos asociados
     },

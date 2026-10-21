@@ -9,7 +9,7 @@ import { BadRequest } from "../utils/error.js";
 
 export const obtenerTodosLosProductosController = async (req, res, next) => {
     try {
-const filtros = req.query;
+    const filtros = req.productoConsulta;
     const productos = await obtenerProductosService(filtros);
     return res.status(200).json(productos);
     }catch (error) {

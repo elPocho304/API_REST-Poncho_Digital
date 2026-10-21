@@ -40,15 +40,18 @@ export const consultarStandsSchema = z.object({
     .uuid({ error: "El ID del sector debe ser un UUID válido" })
     .optional(),
   estado: z
-    .enum(["DISPONIBLE", "OCUPADO", "RESERVADO"], {
-      errorMap: () => ({
-        message: "Estado inválido. Debe ser DISPONIBLE, OCUPADO o RESERVADO",
-      }),
+    .enum(["DISPONIBLE", "OCUPADO", "MANTENIMIENTO"], {
+      error: "Estado inválido. Debe ser DISPONIBLE, OCUPADO o MANTENIMIENTO",
     })
     .optional(),
+  numero: z.string().optional(),
+  ordenPor: z.enum(["numero", "estado"]).default("numero"),
+  orden: z.enum(["asc", "desc"]).default("asc"),
   ordenEstado: z
     .enum(["asc", "desc", "ASC", "DESC"], {
-      errorMap: () => ({ message: "El orden debe ser 'asc' o 'desc'" }),
+      error: "El orden debe ser 'asc' o 'desc'",
     })
     .optional(),
+  pagina: z.coerce.number().int().min(1).default(1),
+  limite: z.coerce.number().int().min(1).max(100).default(10),
 });

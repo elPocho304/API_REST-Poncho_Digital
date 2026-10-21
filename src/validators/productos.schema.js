@@ -32,3 +32,27 @@ export const idProductoParamSchema = z.object({
         : "El ID del producto debe ser un UUID válido",
   }),
 });
+
+export const consultarProductosSchema = z
+  .object({
+    artesanoId: z
+      .uuid({ error: "El ID del artesano debe ser un UUID válido" })
+      .optional(),
+    nombre: z.string().optional(),
+    precioMin: z.coerce.number().min(0).optional(),
+    precioMax: z.coerce.number().min(0).optional(),
+    ordenPor: z.enum(["nombre", "precio", "createdAt"]).default("nombre"),
+    orden: z.enum(["asc", "desc"]).default("asc"),
+    pagina: z.coerce.number().int().min(1).default(1),
+    limite: z.coerce.number().int().min(1).max(100).default(10),
+  })
+  .refine(
+    ({ precioMin, precioMax }) =>
+      precioMin === undefined ||
+      precioMax === undefined ||
+      precioMin <= precioMax,
+    {
+      path: ["precioMax"],
+      message: "El precio máximo debe ser mayor o igual al precio mínimo",
+    },
+  );

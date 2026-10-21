@@ -8,7 +8,7 @@ import {
 
 export const obtenerStandsController = async (req, res, next) => {
   try {
-    const filtros = req.query; //incluye sectorId, estado y ordenEstado validados
+    const filtros = req.standConsulta;
     const stands = await obtenerStandsService(filtros);
     return res.status(200).json(stands);
   } catch (error) {
