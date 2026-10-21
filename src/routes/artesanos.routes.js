@@ -1,6 +1,5 @@
 import { Router } from "express";
 import {
-	obtenerArtesanosController,
   obtenerArtesanoPorIdController,
   crearArtesanoController,
   actualizarArtesanoController,
@@ -10,7 +9,6 @@ import {
 import { 
 	validarCreacionArtesano,
 	validarActualizacionArtesano,
-	validarArtesanoParams,
 	validarIdArtesanoParam,
  } from "../middlewares/artesanos.js";
 
