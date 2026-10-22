@@ -1,7 +1,7 @@
-import { BadRequest } from "../utils/error.js";
 import {
 	obtenerArtesanosService,
   obtenerArtesanoPorIdService,
+  obtenerArtesanoPorUsuarioIdService,
   actualizarArtesanoService,
   eliminarArtesanoService,
 } from "../services/artesanos.services.js";
@@ -50,7 +50,7 @@ export const eliminarArtesanoController = async (req, res, next) => {
 
 export const obtenerMiPerfil = async (req, res, next) => {
   try {
-    const usuario = await obtenerArtesanoPorIdService(req.usuario.id);
+    const usuario = await obtenerArtesanoPorUsuarioIdService(req.usuario.id);
     if (!usuario) {
       res.set("WWW-Authenticate", 'Bearer error = "invalidate_token"');
       return res.status(401).json({

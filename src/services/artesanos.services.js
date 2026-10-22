@@ -7,10 +7,10 @@ export const obtenerArtesanosService = async (filtros = {}) => {
     nombreEmprendimiento,
     rubro,
     localidad,
-    ordenPor,
-    orden ,
-    pagina,
-    limite,
+    ordenPor = "nombreEmprendimiento",
+    orden = "asc",
+    pagina = 1,
+    limite = 10,
   } = filtros;
 
   const artesanos = await prisma.artesano.findMany({
@@ -24,6 +24,9 @@ export const obtenerArtesanosService = async (filtros = {}) => {
       ...(rubro && { rubro: { contains: rubro, mode: "insensitive" } }),
       ...(localidad && { localidad: { contains: localidad, mode: "insensitive" } }),
     },
+    orderBy: [{ [ordenPor]: orden }, { id: "asc" }],
+    skip: (pagina - 1) * limite,
+    take: limite,
     include: {
       productos: true, // Incluye los productos asociados
     },
@@ -49,55 +52,18 @@ export const obtenerArtesanoPorIdService = async (id) => {
   return artesano;
 };
 
-export const crearArtesanoService = async (artesanoDto) => {
-  const {
-    usuarioId,
-    solicitudId,
-    nombreEmprendimiento,
-    rubro,
-    localidad,
-    trayectoria,
-  } = artesanoDto;
-
-  const usuario = await prisma.usuario.findUnique({
-    where: { id: usuarioId },
-    select: { id: true },
-  });
-
-  if (!usuario) {
-    throw new AppError("El usuario especificado no existe", 404);
-  }
-
-  const perfilExistente = await prisma.artesano.findUnique({
+export const obtenerArtesanoPorUsuarioIdService = async (usuarioId) => {
+  const artesano = await prisma.artesano.findUnique({
     where: { usuarioId },
-    select: { id: true },
-  });
-
-  if (perfilExistente) {
-    throw new AppError("El usuario ya posee un perfil de artesano activo", 409);
-  }
-
-  if (solicitudId) {
-    const solicitudExistente = await prisma.solicitudRegistro.findUnique({
-      where: { id: solicitudId },
-      select: { id: true },
-    });
-
-    if (!solicitudExistente) {
-      throw new AppError("La solicitud de registro especificada no existe", 404);
-    }
-  }
-
-  return prisma.artesano.create({
-    data: {
-      usuarioId,
-      solicitudId: solicitudId || null,
-      nombreEmprendimiento,
-      rubro,
-      localidad,
-      trayectoria,
+    include: {
+      productos: true,
+      solicitud: true,
     },
   });
+  if (!artesano) {
+    throw new AppError("No se encontró un perfil de artesano para esta cuenta", 404);
+  }
+  return artesano;
 };
 
 // Actualizar perfil de un artesano existente
