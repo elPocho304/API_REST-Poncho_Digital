@@ -49,6 +49,57 @@ export const obtenerArtesanoPorIdService = async (id) => {
   return artesano;
 };
 
+export const crearArtesanoService = async (artesanoDto) => {
+  const {
+    usuarioId,
+    solicitudId,
+    nombreEmprendimiento,
+    rubro,
+    localidad,
+    trayectoria,
+  } = artesanoDto;
+
+  const usuario = await prisma.usuario.findUnique({
+    where: { id: usuarioId },
+    select: { id: true },
+  });
+
+  if (!usuario) {
+    throw new AppError("El usuario especificado no existe", 404);
+  }
+
+  const perfilExistente = await prisma.artesano.findUnique({
+    where: { usuarioId },
+    select: { id: true },
+  });
+
+  if (perfilExistente) {
+    throw new AppError("El usuario ya posee un perfil de artesano activo", 409);
+  }
+
+  if (solicitudId) {
+    const solicitudExistente = await prisma.solicitudRegistro.findUnique({
+      where: { id: solicitudId },
+      select: { id: true },
+    });
+
+    if (!solicitudExistente) {
+      throw new AppError("La solicitud de registro especificada no existe", 404);
+    }
+  }
+
+  return prisma.artesano.create({
+    data: {
+      usuarioId,
+      solicitudId: solicitudId || null,
+      nombreEmprendimiento,
+      rubro,
+      localidad,
+      trayectoria,
+    },
+  });
+};
+
 // Actualizar perfil de un artesano existente
 export const actualizarArtesanoService = async (id, datosActualizacion) => {
   // Verificar existencia previa

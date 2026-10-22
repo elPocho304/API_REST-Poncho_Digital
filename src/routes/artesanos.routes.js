@@ -7,12 +7,11 @@ import {
   obtenerTodosLosArtesanosController,
 } from "../controllers/artesanos.controllers.js";
 import { 
+	validarCreacionArtesano,
 	validarActualizacionArtesano,
 	validarIdArtesanoParam,
 	validarConsultaArtesanos,
  } from "../middlewares/artesanos.js";
-import { validarCreacionArtesano } from "../middlewares/artesanos.creacion.js";
-import { validarConsultaArtesanos } from "../middlewares/artesanos.consulta.js";
 
 const router = Router();
 

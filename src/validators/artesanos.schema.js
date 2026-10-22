@@ -1,5 +1,27 @@
 import { z } from "zod";
 
+export const crearArtesanoSchema = z.object({
+  usuarioId: z.uuid({
+    error: (issue) =>
+      issue.input === undefined
+        ? "El ID de usuario es obligatorio"
+        : "El ID de usuario debe ser un UUID válido",
+  }),
+  solicitudId: z
+    .uuid({ error: "El ID de solicitud debe ser un UUID válido" })
+    .optional(),
+  nombreEmprendimiento: z
+    .string()
+    .trim()
+    .min(2, "El nombre debe tener al menos 2 caracteres"),
+  rubro: z.string().trim().min(2, "El rubro debe tener al menos 2 caracteres"),
+  localidad: z
+    .string()
+    .trim()
+    .min(2, "La localidad debe tener al menos 2 caracteres"),
+  trayectoria: z.string().optional(),
+});
+
 export const actualizarArtesanoSchema = z
   .object({
     nombreEmprendimiento: z

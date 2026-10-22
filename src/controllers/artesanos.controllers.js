@@ -7,6 +7,15 @@ import {
   eliminarArtesanoService,
 } from "../services/artesanos.services.js";
 
+export const crearArtesanoController = async (req, res, next) => {
+	try {
+		const nuevoArtesano = await crearArtesanoService(req.body);
+		return res.status(201).json(nuevoArtesano);
+	} catch (error) {
+		next(error);
+	}
+};
+
 export const obtenerTodosLosArtesanosController = async (req, res, next) => {
 	try {
 		const filtros = req.artesanoConsulta;
