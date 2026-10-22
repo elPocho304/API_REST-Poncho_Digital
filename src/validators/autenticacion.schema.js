@@ -58,6 +58,6 @@ export const validarRegistro = z.object({
 });
 
 export const inicioSesionShema = z.object({
-  email: z.email("el email no tiene un formato valido"),
-  password: z.string().min(1, "la contraseña es obligatoria"),
+  email: z.string().trim().pipe(z.email("el email no tiene un formato valido")),
+  password: z.string().trim().min(1, "la contraseña es obligatoria"),
 });

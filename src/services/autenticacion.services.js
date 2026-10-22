@@ -8,7 +8,7 @@ export const crearRegistro = async (registroDto) => {
   const {
     email,
     password,
-    nombreEmpredimiento,
+    nombreEmprendimiento,
     rubro,
     localidad,
     descripcion,
@@ -38,7 +38,7 @@ export const crearRegistro = async (registroDto) => {
     const nuevaSolicitud = await tx.solicitudRegistro.create({
       data: {
         usuarioId: nuevoUsuario.id,
-        nombreEmpredimiento: nombreEmpredimiento,
+        nombreEmprendimiento,
         rubro: rubro,
         localidad: localidad,
         descripcion: descripcion,
@@ -51,7 +51,7 @@ export const crearRegistro = async (registroDto) => {
       email: nuevoUsuario.email,
       rol: nuevoUsuario.rol,
       createAt: nuevoUsuario.createAt,
-      nombreEmpredimiento: nuevaSolicitud.nombreEmpredimiento,
+      nombreEmprendimiento: nuevaSolicitud.nombreEmprendimiento,
     };
   });
 
@@ -66,8 +66,11 @@ export const iniciarSesionService = async (usuarioDto) => {
   const passwordValida = usuario
     ? await bcrypt.compare(password, usuario.passwordHash)
     : false;
-  if (!usuario || !passwordValida || !usuario.activo) {
-    throw new AppError("Credenciales inválidas o cuenta inactiva", 401);
+  if (!usuario || !passwordValida) {
+    throw new AppError("Credenciales inválidas", 401);
+  }
+  if (usuario.activo != true) {
+    throw new AppError("La cuenta está inactiva", 403);
   }
   return {
     id: usuario.id,
