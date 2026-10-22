@@ -6,19 +6,6 @@ import {
 } from "../validators/artesanos.schema.js";
 import { BadRequest } from "../utils/error.js";
 
-export const validarCreacionArtesano = (req, res, next) => {
-  const resultado = crearArtesanoSchema.safeParse(req.body);
-  if (!resultado.success) {
-    const mensajes = resultado.error.issues
-      .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
-      .join(";");
-    return next(new BadRequest(mensajes));
-  }
-
-  req.body = resultado.data;
-  next();
-};
-
 export const validarConsultaArtesanos = (req, res, next) => {
   const resultado = consultarArtesanosSchema.safeParse(req.query);
   if (!resultado.success) {
