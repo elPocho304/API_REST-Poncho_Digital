@@ -1,3 +1,5 @@
+import jwt from "jsonwebtoken";
+import { verificarToken } from "./tokens.service.js";
 import prisma from "../config/prisma.js";
 import bcrypt from "bcrypt";
 import { AppError } from "../utils/error.js";
