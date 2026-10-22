@@ -15,10 +15,10 @@ import {
 
 const router = Router();
 
-router.get("/obtener", validarConsultaArtesanos, obtenerTodosLosArtesanosController);
+router.get("/", validarConsultaArtesanos, obtenerTodosLosArtesanosController);
 router.get("/me", autenticarUsuario, obtenerMiPerfil);
-router.get("/obtenerPorId/:id", validarIdArtesanoParam, obtenerArtesanoPorIdController);
-router.patch("/actualizar/:id", validarIdArtesanoParam, validarActualizacionArtesano, actualizarArtesanoController);
-router.delete("/eliminar/:id", validarIdArtesanoParam, eliminarArtesanoController);
+router.get("/:id", validarIdArtesanoParam, obtenerArtesanoPorIdController);
+router.patch("/:id", validarIdArtesanoParam, validarActualizacionArtesano, actualizarArtesanoController);
+router.delete("/:id", validarIdArtesanoParam, eliminarArtesanoController);
 
 export default router;
