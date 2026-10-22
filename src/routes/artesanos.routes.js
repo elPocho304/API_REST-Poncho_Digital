@@ -1,7 +1,8 @@
 import { Router } from "express";
+import { obtenerMiPerfil } from "../controllers/artesanos.controllers.js";
+import { autenticarUsuario } from "../middlewares/autenticacion.js";
 import {
   obtenerArtesanoPorIdController,
-  crearArtesanoController,
   actualizarArtesanoController,
   eliminarArtesanoController,
   obtenerTodosLosArtesanosController,
@@ -11,14 +12,13 @@ import {
 	validarIdArtesanoParam,
 	validarConsultaArtesanos,
  } from "../middlewares/artesanos.js";
-import { validarCreacionArtesano } from "../middlewares/artesanos.creacion.js";
-import { validarConsultaArtesanos } from "../middlewares/artesanos.consulta.js";
+import { validarConsultaArtesanos } from "../middlewares/artesanos.js";
 
 const router = Router();
 
 router.get("/obtener", validarConsultaArtesanos, obtenerTodosLosArtesanosController);
+router.get("/me", autenticarUsuario, obtenerMiPerfil);
 router.get("/obtenerPorId/:id", validarIdArtesanoParam, obtenerArtesanoPorIdController);
-router.post("/", validarCreacionArtesano, crearArtesanoController);
 router.patch("/actualizar/:id", validarIdArtesanoParam, validarActualizacionArtesano, actualizarArtesanoController);
 router.delete("/eliminar/:id", validarIdArtesanoParam, eliminarArtesanoController);
 

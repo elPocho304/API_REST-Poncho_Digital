@@ -2,7 +2,6 @@ import { BadRequest } from "../utils/error.js";
 import {
 	obtenerArtesanosService,
   obtenerArtesanoPorIdService,
-  crearArtesanoService,
   actualizarArtesanoService,
   eliminarArtesanoService,
 } from "../services/artesanos.services.js";
@@ -47,4 +46,19 @@ export const eliminarArtesanoController = async (req, res, next) => {
 	}catch(error){
 		next (error);
 	}
+};
+
+export const obtenerMiPerfil = async (req, res, next) => {
+  try {
+    const usuario = await obtenerArtesanoPorIdService(req.usuario.id);
+    if (!usuario) {
+      res.set("WWW-Authenticate", 'Bearer error = "invalidate_token"');
+      return res.status(401).json({
+        mensaje: "La cuenta asociada al token no existe.",
+      });
+    }
+    return res.status(200).json({ usuario: usuario });
+  } catch (error) {
+    return next(error);
+  }
 };
