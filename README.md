@@ -68,6 +68,14 @@ Todas las respuestas utilizan formato JSON.
 | POST | `/sectores/agregar` | Crea un sector. Requiere `nombre` y `pabellonId`. |
 | PATCH | `/sectores/actualizar/:id` | Actualiza `nombre` y/o `pabellonId` de un sector. |
 | DELETE | `/sectores/eliminar/:id` | Elimina un sector si no tiene stands asociados. |
+| GET | `/solicitudes-registro/obtener` | Lista solicitudes. Acepta filtros `estado`, `usuarioId`, `resueltaPorId`, `nombreEmprendimiento`, `rubro` y `localidad`; orden `ordenPor`/`orden` y paginación `pagina`/`limite`. |
+| GET | `/solicitudes-registro/obtenerPorId/:id` | Obtiene una solicitud de registro por UUID. |
+| DELETE | `/solicitudes-registro/eliminar/:id` | Elimina una solicitud de registro por UUID. |
+| POST | `/asignaciones-stand/asignar` | Asigna un stand existente y disponible a un artesano. Requiere `artesanoId` y `standId`. |
+| GET | `/asignaciones-stand/obtener` | Lista asignaciones. Acepta filtros `artesanoId`, `standId` y `activo`; orden `ordenPor`/`orden` y paginación `pagina`/`limite`. |
+| GET | `/asignaciones-stand/obtenerPorId/:id` | Obtiene una asignación por UUID, con datos del artesano, stand, sector y pabellón. |
+| PATCH | `/asignaciones-stand/actualizar/:id` | Activa o desactiva una asignación. Requiere `activo` booleano; al desactivar, libera el stand si no quedan otras asignaciones activas. |
+| DELETE | `/asignaciones-stand/eliminar/:id` | Elimina una asignación por UUID y libera el stand si no tiene otra asignación activa. |
 
 ## Ejemplos de cuerpos JSON
 
@@ -86,3 +94,5 @@ Todas las respuestas utilizan formato JSON.
 - `400 Bad Request`: el ID no es un entero positivo o faltan datos obligatorios.
 - `404 Not Found`: no existe un recurso con el ID indicado.
 - `409 Conflict`: el nombre del pabellón ya existe o no se puede eliminar un pabellón/sector con recursos asociados.
+
+> La ruta de asignación no tiene autorización de administrador mientras la API no implemente autenticación/autorización.

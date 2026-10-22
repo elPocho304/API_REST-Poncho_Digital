@@ -1,10 +1,24 @@
 import { z } from "zod";
 
-//Cambiar ya que no existe funcion padre
-export const actualizarArtesanoSchema = crearArtesanoSchema.partial().omit({
-  usuarioId: true, // El ID de usuario no debe modificarse una vez vinculado
-  solicitudId: true,
-});
+export const actualizarArtesanoSchema = z
+  .object({
+    nombreEmprendimiento: z
+      .string()
+      .min(2, "El nombre debe tener al menos 2 caracteres")
+      .optional(),
+    rubro: z
+      .string()
+      .min(2, "El rubro debe tener al menos 2 caracteres")
+      .optional(),
+    localidad: z
+      .string()
+      .min(2, "La localidad debe tener al menos 2 caracteres")
+      .optional(),
+    trayectoria: z.string().optional(),
+  })
+  .refine((datos) => Object.keys(datos).length > 0, {
+    message: "Debe proporcionar al menos un campo para actualizar",
+  });
 
 //validamos params de ruta
 export const idArtesanoParamSchema = z.object({
