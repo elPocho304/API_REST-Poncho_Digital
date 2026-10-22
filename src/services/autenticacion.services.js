@@ -1,5 +1,3 @@
-import jwt from "jsonwebtoken";
-import { verificarToken } from "./tokens.service.js";
 import prisma from "../config/prisma.js";
 import bcrypt from "bcrypt";
 import { AppError } from "../utils/error.js";
@@ -65,12 +63,11 @@ export const iniciarSesionService = async (usuarioDto) => {
   const usuario = await prisma.usuario.findUnique({
     where: { email: email },
   });
-  if (!usuario) {
-    throw new AppError("No existe un usuario con ese email", 401);
-  }
-  const passwordValida = await bcrypt.compare(password, usuario.passwordHash);
-  if (!passwordValida) {
-    throw new AppError("Contraseña incorrecta", 401);
+  const passwordValida = usuario
+    ? await bcrypt.compare(password, usuario.passwordHash)
+    : false;
+  if (!usuario || !passwordValida || !usuario.activo) {
+    throw new AppError("Credenciales inválidas o cuenta inactiva", 401);
   }
   return {
     id: usuario.id,
