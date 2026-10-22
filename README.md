@@ -68,6 +68,9 @@ Todas las respuestas utilizan formato JSON.
 | POST | `/sectores/agregar` | Crea un sector. Requiere `nombre` y `pabellonId`. |
 | PATCH | `/sectores/actualizar/:id` | Actualiza `nombre` y/o `pabellonId` de un sector. |
 | DELETE | `/sectores/eliminar/:id` | Elimina un sector si no tiene stands asociados. |
+| GET | `/solicitudes-registro/obtener` | Lista solicitudes. Acepta filtros `estado`, `usuarioId`, `resueltaPorId`, `nombreEmprendimiento`, `rubro` y `localidad`; orden `ordenPor`/`orden` y paginación `pagina`/`limite`. |
+| GET | `/solicitudes-registro/obtenerPorId/:id` | Obtiene una solicitud de registro por UUID. |
+| DELETE | `/solicitudes-registro/eliminar/:id` | Elimina una solicitud de registro por UUID. |
 
 ## Ejemplos de cuerpos JSON
 

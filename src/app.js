@@ -5,6 +5,7 @@ import standsRoutes from "./routes/stands.routes.js";
 import pabellonesRoutes from "./routes/pabellones.routes.js";
 import sectoresRoutes from "./routes/sectores.routes.js";
 import autenticacionRoutes from "./routes/autenticacion.routes.js";
+import solicitudRegistroRoutes from "./routes/solicitudRegistro.routes.js";
 import { manejadorErrores } from './middlewares/manejadorErrores.js';
 import { rutaNoEncontrada } from "./middlewares/noEncontrado.js";
 
@@ -22,6 +23,7 @@ app.use("/pabellones", pabellonesRoutes);
 app.use("/sectores", sectoresRoutes);
 app.use("/artesanos", artesanosRoutes);
 app.use("/autenticacion", autenticacionRoutes);
+app.use("/solicitudes-registro", solicitudRegistroRoutes);
 
 app.use(rutaNoEncontrada);
 app.use(manejadorErrores);
