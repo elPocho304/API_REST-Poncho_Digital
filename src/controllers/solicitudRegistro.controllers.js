@@ -2,6 +2,7 @@ import {
   obtenerSolicitudesRegistroService,
   obtenerSolicitudRegistroPorIdService,
   eliminarSolicitudRegistroService,
+  resolverSolicitudRegistroService,
 } from "../services/solicitudRegistro.services.js";
 
 export const obtenerSolicitudesRegistroController = async (req, res, next) => {
@@ -34,5 +35,18 @@ export const eliminarSolicitudRegistroController = async (req, res, next) => {
     return res.status(200).json(resultado);
   } catch (error) {
     next(error);
+  }
+};
+
+export const resolverSolicitudRegistroController = async (req, res, next) => {
+  try {
+    const solicitud = await resolverSolicitudRegistroService(
+      req.params.id,
+      req.usuario.id,
+      req.body,
+    );
+    return res.status(200).json(solicitud);
+  } catch (error) {
+    return next(error);
   }
 };

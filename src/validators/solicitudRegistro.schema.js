@@ -41,3 +41,8 @@ export const consultarSolicitudesRegistroSchema = z.object({
   pagina: z.coerce.number().int().min(1).default(1),
   limite: z.coerce.number().int().min(1).max(100).default(10),
 });
+
+export const resolverSolicitudRegistroSchema = z.object({
+  estado: z.enum(["APROBADA", "RECHAZADA", "MODIFICACION_SOLICITADA"]),
+  comentarioAdmin: z.string().max(1000).optional(),
+});

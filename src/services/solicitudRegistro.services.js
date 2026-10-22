@@ -84,3 +84,63 @@ export const eliminarSolicitudRegistroService = async (id) => {
   await prisma.solicitudRegistro.delete({ where: { id } });
   return { mensaje: "Solicitud de registro eliminada correctamente" };
 };
+
+export const resolverSolicitudRegistroService = async (
+  id,
+  administradorId,
+  { estado, comentarioAdmin },
+) =>
+  prisma.$transaction(async (tx) => {
+    const solicitud = await tx.solicitudRegistro.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        usuarioId: true,
+        nombreEmprendimiento: true,
+        rubro: true,
+        localidad: true,
+        estado: true,
+      },
+    });
+    if (!solicitud) {
+      throw new AppError("No se encontró la solicitud de registro", 404);
+    }
+    if (solicitud.estado !== "PENDIENTE") {
+      throw new AppError("La solicitud ya fue resuelta", 409);
+    }
+
+    if (estado === "APROBADA") {
+      const perfilExistente = await tx.artesano.findUnique({
+        where: { usuarioId: solicitud.usuarioId },
+        select: { id: true },
+      });
+      if (perfilExistente) {
+        throw new AppError("El usuario ya posee un perfil de artesano", 409);
+      }
+
+      await tx.artesano.create({
+        data: {
+          usuarioId: solicitud.usuarioId,
+          solicitudId: solicitud.id,
+          nombreEmprendimiento: solicitud.nombreEmprendimiento,
+          rubro: solicitud.rubro,
+          localidad: solicitud.localidad,
+        },
+      });
+      await tx.usuario.update({
+        where: { id: solicitud.usuarioId },
+        data: { rol: "ARTESANO" },
+      });
+    }
+
+    return tx.solicitudRegistro.update({
+      where: { id },
+      data: {
+        estado,
+        ...(comentarioAdmin !== undefined && { comentarioAdmin }),
+        resueltaPorId: administradorId,
+        fechaResolucion: new Date(),
+      },
+      include: incluirRelacionesSeguras,
+    });
+  });

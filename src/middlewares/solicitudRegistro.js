@@ -1,6 +1,7 @@
 import {
   consultarSolicitudesRegistroSchema,
   idSolicitudParamSchema,
+  resolverSolicitudRegistroSchema,
 } from "../validators/solicitudRegistro.schema.js";
 import { BadRequest } from "../utils/error.js";
 
@@ -25,4 +26,12 @@ export const validarIdSolicitudRegistroParam = (req, res, next) => {
 
   req.params = resultado.data;
   next();
+};
+
+export const validarResolucionSolicitudRegistro = (req, res, next) => {
+  const resultado = resolverSolicitudRegistroSchema.safeParse(req.body);
+  if (!resultado.success) return validarResultado(resultado, next);
+
+  req.body = resultado.data;
+  return next();
 };
