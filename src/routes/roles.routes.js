@@ -1,4 +1,5 @@
 import express from "express";
+import { autenticarUsuario, autorizarRoles } from "../middlewares/autenticacion.js";
 import { roles } from "../data/roles.js";
 import { validarId } from "../middlewares/validarId.js";
 import {
@@ -10,6 +11,7 @@ import {
 } from "../controllers/roles.controllers.js";
 
 const router = express.Router();
+router.use(autenticarUsuario, autorizarRoles("ADMINISTRADOR"));
 
 router.get("/", obtenerTodosLosRoles);
 router.get("/:id", validarId(roles), obtenerRolPorId);

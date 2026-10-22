@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { autenticarUsuario, autorizarRoles } from "../middlewares/autenticacion.js";
 import {
   obtenerSectoresController,
   obtenerSectorPorIdController,
@@ -14,6 +15,7 @@ import {
 } from "../middlewares/sectores.js";
 
 const router = Router();
+const autenticarAdministrador = [autenticarUsuario, autorizarRoles("ADMINISTRADOR")];
 
 router.get("/obtener", validarConsultarSectores, obtenerSectoresController);
 router.get(
@@ -21,15 +23,17 @@ router.get(
   validarIdSectorParam,
   obtenerSectorPorIdController,
 );
-router.post("/agregar", validarCreacionSector, crearSectorController);
+router.post("/agregar", ...autenticarAdministrador, validarCreacionSector, crearSectorController);
 router.patch(
   "/actualizar/:id",
+  ...autenticarAdministrador,
   validarIdSectorParam,
   validarActualizacionSector,
   actualizarSectorController,
 );
 router.delete(
   "/eliminar/:id",
+  ...autenticarAdministrador,
   validarIdSectorParam,
   eliminarSectorController,
 );

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { autenticarUsuario, autorizarRoles } from "../middlewares/autenticacion.js";
 import {
   obtenerPabellonesController,
   obtenerPabellonPorIdController,
@@ -14,6 +15,7 @@ import {
 } from "../middlewares/pabellones.js";
 
 const router = Router();
+const autenticarAdministrador = [autenticarUsuario, autorizarRoles("ADMINISTRADOR")];
 
 router.get("/obtener", validarConsultarPabellones, obtenerPabellonesController);
 router.get(
@@ -21,15 +23,17 @@ router.get(
   validarIdPabellonParam,
   obtenerPabellonPorIdController,
 );
-router.post("/agregar", validarCreacionPabellon, crearPabellonController);
+router.post("/agregar", ...autenticarAdministrador, validarCreacionPabellon, crearPabellonController);
 router.patch(
   "/actualizar/:id",
+  ...autenticarAdministrador,
   validarIdPabellonParam,
   validarActualizacionPabellon,
   actualizarPabellonController,
 );
 router.delete(
   "/eliminar/:id",
+  ...autenticarAdministrador,
   validarIdPabellonParam,
   eliminarPabellonController,
 );
