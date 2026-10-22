@@ -30,18 +30,6 @@ export const idArtesanoParamSchema = z.object({
   }),
 });
 
-//validamos las consultas
-export const artesanoQuerySchema = z.object({
-  rubro: z.string().optional(),
-  localidad: z.string().optional(),
-  nombreEmprendimiento: z.string().optional(),
-  ordenPor: z
-    .enum(["nombreEmprendimiento", "rubro", "localidad", "createdAt"])
-    .default("nombreEmprendimiento"),
-  orden: z.enum(["asc", "desc"]).default("asc"),
-  pagina: z.coerce.number().int().min(1).default(1),
-  limite: z.coerce.number().int().min(1).max(100).default(10),
-});
 
 export const consultarArtesanosSchema = z.object({
   nombreEmprendimiento: z.string().optional(),
