@@ -8,10 +8,12 @@ export const crearStandSchema = z.object({
     .min(1, "El número del stand no puede estar vacío"),
 
   sectorId: z
-    .string({
-      required_error: "El ID del sector es obligatorio",
-    })
-    .uuid({ message: "El ID del sector debe ser un UUID válido" }),
+    .uuid({
+      error: (issue) =>
+        issue.input === undefined
+          ? "El ID del sector es obligatorio"
+          : "El ID del sector debe ser un UUID válido",
+    }),
 
   estado: z
     .enum(["DISPONIBLE", "OCUPADO", "RESERVADO"], {
@@ -25,28 +27,31 @@ export const crearStandSchema = z.object({
 export const actualizarStandSchema = crearStandSchema.partial();
 
 export const idStandParamSchema = z.object({
-  id: z
-    .string({
-      required_error: "El ID del stand es obligatorio en los parámetros",
-    })
-    .uuid({ message: "El ID del stand debe ser un UUID válido" }),
+  id: z.uuid({
+    error: (issue) =>
+      issue.input === undefined
+        ? "El ID del stand es obligatorio en los parámetros"
+        : "El ID del stand debe ser un UUID válido",
+  }),
 });
 
 export const consultarStandsSchema = z.object({
   sectorId: z
-    .string()
-    .uuid({ message: "El ID del sector debe ser un UUID válido" })
+    .uuid({ error: "El ID del sector debe ser un UUID válido" })
     .optional(),
   estado: z
-    .enum(["DISPONIBLE", "OCUPADO", "RESERVADO"], {
-      errorMap: () => ({
-        message: "Estado inválido. Debe ser DISPONIBLE, OCUPADO o RESERVADO",
-      }),
+    .enum(["DISPONIBLE", "OCUPADO", "MANTENIMIENTO"], {
+      error: "Estado inválido. Debe ser DISPONIBLE, OCUPADO o MANTENIMIENTO",
     })
     .optional(),
+  numero: z.string().optional(),
+  ordenPor: z.enum(["numero", "estado"]).default("numero"),
+  orden: z.enum(["asc", "desc"]).default("asc"),
   ordenEstado: z
     .enum(["asc", "desc", "ASC", "DESC"], {
-      errorMap: () => ({ message: "El orden debe ser 'asc' o 'desc'" }),
+      error: "El orden debe ser 'asc' o 'desc'",
     })
     .optional(),
+  pagina: z.coerce.number().int().min(1).default(1),
+  limite: z.coerce.number().int().min(1).max(100).default(10),
 });

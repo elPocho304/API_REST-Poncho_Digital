@@ -3,11 +3,14 @@ import { z } from "zod";
 
 //esquema para crear un artesano luego de que se apruebe la solicitud
 export const crearArtesanoSchema = z.object({
-  usuarioId: z.string({
-    required_error: "El ID de usuario es obligatorio",
-  }).uuid("El ID de usuario debe ser un UUID válido"),
+  usuarioId: z.uuid({
+    error: (issue) =>
+      issue.input === undefined
+        ? "El ID de usuario es obligatorio"
+        : "El ID de usuario debe ser un UUID válido",
+  }),
   
-  solicitudId: z.string().uuid("El ID de solicitud debe ser un UUID válido").optional(),
+  solicitudId: z.uuid({ error: "El ID de solicitud debe ser un UUID válido" }).optional(),
   
   nombreEmprendimiento: z.string({
     required_error: "El nombre del emprendimiento es obligatorio",
@@ -33,7 +36,23 @@ export const actualizarArtesanoSchema = crearArtesanoSchema.partial().omit({
 
 //validamos params de ruta
 export const idArtesanoParamSchema = z.object({
-  id: z.string({
-    required_error: "El ID del artesano es obligatorio en los parámetros",
-  }).uuid("El ID del artesano debe ser un UUID válido"),
+  id: z.uuid({
+    error: (issue) =>
+      issue.input === undefined
+        ? "El ID del artesano es obligatorio en los parámetros"
+        : "El ID del artesano debe ser un UUID válido",
+  }),
+});
+
+//validamos las consultas
+export const artesanoQuerySchema = z.object({
+  rubro: z.string().optional(),
+  localidad: z.string().optional(),
+  nombreEmprendimiento: z.string().optional(),
+  ordenPor: z
+    .enum(["nombreEmprendimiento", "rubro", "localidad", "createdAt"])
+    .default("nombreEmprendimiento"),
+  orden: z.enum(["asc", "desc"]).default("asc"),
+  pagina: z.coerce.number().int().min(1).default(1),
+  limite: z.coerce.number().int().min(1).max(100).default(10),
 });

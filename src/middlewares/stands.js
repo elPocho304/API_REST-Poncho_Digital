@@ -51,6 +51,6 @@ export const validarConsultarStands = (req, res, next) => {
 
     return next(new BadRequest(mensajes));
   }
-  req.query = resultado.data;
+  req.standConsulta = resultado.data;
   next();
 };

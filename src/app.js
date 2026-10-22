@@ -2,6 +2,8 @@ import express from "express";
 import artesanosRoutes from "./routes/artesanos.routes.js";
 import productosRoutes from "./routes/productos.routes.js";
 import standsRoutes from "./routes/stands.routes.js";
+import pabellonesRoutes from "./routes/pabellones.routes.js";
+import sectoresRoutes from "./routes/sectores.routes.js";
 import autenticacionRoutes from "./routes/autenticacion.routes.js";
 import { manejadorErrores } from './middlewares/manejadorErrores.js';
 import { rutaNoEncontrada } from "./middlewares/noEncontrado.js";
@@ -16,6 +18,8 @@ app.get('/', (req, res) => {
 
 app.use("/productos", productosRoutes);
 app.use("/stands", standsRoutes);
+app.use("/pabellones", pabellonesRoutes);
+app.use("/sectores", sectoresRoutes);
 app.use("/artesanos", artesanosRoutes);
 app.use("/autenticacion", autenticacionRoutes);
 

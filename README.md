@@ -1,6 +1,6 @@
 # API Poncho Digital
 
-API REST para gestionar artesanos, productos, roles y stands de Poncho Digital.
+API REST para gestionar artesanos, productos, pabellones, sectores y stands de Poncho Digital.
 
 ## Integrantes
 
@@ -59,6 +59,16 @@ Todas las respuestas utilizan formato JSON.
 | POST | `/stands` | Crea un stand. |
 | PUT | `/stands/:id` | Actualiza un stand. |
 | DELETE | `/stands/:id` | Elimina un stand. |
+| GET | `/pabellones/obtener` | Lista pabellones. Acepta `nombre`, `pagina` y `limite`. |
+| GET | `/pabellones/obtenerPorId/:id` | Obtiene un pabellón por UUID, con sus sectores. |
+| POST | `/pabellones/agregar` | Crea un pabellón. Requiere `nombre`; acepta `descripcion`. |
+| PATCH | `/pabellones/actualizar/:id` | Actualiza `nombre` y/o `descripcion` de un pabellón. |
+| DELETE | `/pabellones/eliminar/:id` | Elimina un pabellón si no tiene sectores asociados. |
+| GET | `/sectores/obtener` | Lista sectores. Acepta `pabellonId`, `nombre`, `pagina` y `limite`. |
+| GET | `/sectores/obtenerPorId/:id` | Obtiene un sector por UUID, con su pabellón y stands. |
+| POST | `/sectores/agregar` | Crea un sector. Requiere `nombre` y `pabellonId`. |
+| PATCH | `/sectores/actualizar/:id` | Actualiza `nombre` y/o `pabellonId` de un sector. |
+| DELETE | `/sectores/eliminar/:id` | Elimina un sector si no tiene stands asociados. |
 
 ## Ejemplos de cuerpos JSON
 
@@ -87,3 +97,4 @@ Todas las respuestas utilizan formato JSON.
 
 - `400 Bad Request`: el ID no es un entero positivo o faltan datos obligatorios.
 - `404 Not Found`: no existe un recurso con el ID indicado.
+- `409 Conflict`: el nombre del pabellón ya existe o no se puede eliminar un pabellón/sector con recursos asociados.

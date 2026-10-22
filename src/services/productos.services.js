@@ -2,13 +2,31 @@ import prisma from "../config/prisma.js";
 import { AppError } from "../utils/error.js";
 
 export const obtenerProductosService = async (filtros = {}) => {
-  const { artesanoId, nombre } = filtros;
+  const {
+    artesanoId,
+    nombre,
+    precioMin,
+    precioMax,
+    ordenPor = "nombre",
+    orden = "asc",
+    pagina = 1,
+    limite = 10,
+  } = filtros;
 
   const productos = await prisma.producto.findMany({
     where: {
       ...(artesanoId && { artesanoId }),
       ...(nombre && { nombre: { contains: nombre, mode: "insensitive" } }),
+      ...((precioMin !== undefined || precioMax !== undefined) && {
+        precio: {
+          ...(precioMin !== undefined && { gte: precioMin }),
+          ...(precioMax !== undefined && { lte: precioMax }),
+        },
+      }),
     },
+    orderBy: [{ [ordenPor]: orden }, { id: "asc" }],
+    skip: (pagina - 1) * limite,
+    take: limite,
     include: {
       artesano: {
         select: {

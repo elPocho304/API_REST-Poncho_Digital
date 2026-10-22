@@ -9,7 +9,7 @@ import {
 
 export const obtenerTodosLosArtesanosController = async (req, res, next) => {
 	try {
-		const filtros = req.query;
+		const filtros = req.artesanoConsulta;
 		const artesanos = await obtenerArtesanosService(filtros);
 		return res.status(200).json(artesanos)
 

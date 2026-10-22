@@ -15,15 +15,15 @@ import {
 
 const router = Router();
 
-router.get("/", validarConsultarStands, obtenerStandsController);
-router.get("/:id", validarIdStandParam, obtenerStandPorIdController);
-router.post("/", validarCreacionStand, crearStandController);
+router.get("/obtener", validarConsultarStands, obtenerStandsController);
+router.get("/obtenerPorId/:id", validarIdStandParam, obtenerStandPorIdController);
+router.post("/agregar", validarCreacionStand, crearStandController);
 router.patch(
-  "/:id",
+  "/actualizar/:id",
   validarIdStandParam,
   validarActualizacionStand,
   actualizarStandController,
 );
-router.delete("/:id", validarIdStandParam, eliminarStandController);
+router.delete("/eliminar/:id", validarIdStandParam, eliminarStandController);
 
 export default router;
