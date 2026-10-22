@@ -7,6 +7,7 @@ import sectoresRoutes from "./routes/sectores.routes.js";
 import autenticacionRoutes from "./routes/autenticacion.routes.js";
 import solicitudRegistroRoutes from "./routes/solicitudRegistro.routes.js";
 import asignacionesStandRoutes from "./routes/asignacionesStand.routes.js";
+import usuariosRoutes from "./routes/usuarios.routes.js";
 import "./config/jwt.js";
 import { manejadorErrores } from './middlewares/manejadorErrores.js';
 import { rutaNoEncontrada } from "./middlewares/noEncontrado.js";
@@ -27,6 +28,7 @@ app.use("/artesanos", artesanosRoutes);
 app.use("/autenticacion", autenticacionRoutes);
 app.use("/solicitudes-registro", solicitudRegistroRoutes);
 app.use("/asignaciones-stand", asignacionesStandRoutes);
+app.use("/usuarios", usuariosRoutes);
 
 app.use(rutaNoEncontrada);
 app.use(manejadorErrores);

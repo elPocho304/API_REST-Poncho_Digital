@@ -45,9 +45,9 @@ Todas las respuestas utilizan formato JSON.
 | DELETE | `/artesanos/:id` | Elimina un artesano. |
 | GET | `/productos` | Lista todos los productos. Acepta filtros `nombre`, `descripcion`, `precio` y `categoria`. |
 | GET | `/productos/:id` | Obtiene un producto por ID. |
-| POST | `/productos` | Crea un producto. Requiere `nombre`, `precio` y `categoria`. |
-| PUT | `/productos/:id` | Actualiza un producto. |
-| DELETE | `/productos/:id` | Elimina un producto. |
+| POST | `/productos/agregar` | Crea un producto como artesano autenticado. Requiere `nombre` y `precio`; el propietario se obtiene de la cuenta. |
+| PATCH | `/productos/actualizar/:id` | Actualiza un producto propio; un producto de otro artesano responde `404`. |
+| DELETE | `/productos/eliminar/:id` | Elimina un producto propio; un producto de otro artesano responde `404`. |
 | GET | `/roles` | Lista todos los roles. Acepta el filtro `nombre`. |
 | GET | `/roles/:id` | Obtiene un rol por ID. |
 | POST | `/roles` | Crea un rol. Requiere `nombre`. |
@@ -76,6 +76,20 @@ Todas las respuestas utilizan formato JSON.
 | GET | `/asignaciones-stand/obtenerPorId/:id` | Obtiene una asignación por UUID, con datos del artesano, stand, sector y pabellón. |
 | PATCH | `/asignaciones-stand/actualizar/:id` | Activa o desactiva una asignación. Requiere `activo` booleano; al desactivar, libera el stand si no quedan otras asignaciones activas. |
 | DELETE | `/asignaciones-stand/eliminar/:id` | Elimina una asignación por UUID y libera el stand si no tiene otra asignación activa. |
+| GET | `/productos/mis-productos` | Lista los productos del artesano autenticado; ignora el filtro de propietario enviado por el cliente. |
+| PATCH | `/solicitudes-registro/resolver/:id` | Resuelve una solicitud como `APROBADA`, `RECHAZADA` o `MODIFICACION_SOLICITADA`; solo administradores. |
+| POST | `/usuarios/administradores` | Crea una cuenta de administrador; solo administradores. |
+| PATCH | `/usuarios/:id/activo` | Activa o desactiva una cuenta con `{ "activo": true/false }`; solo administradores. No permite desactivar al último administrador activo. |
+
+## Autenticación y autorización
+
+`POST /autenticacion/registro` crea una cuenta `PENDIENTE` y su solicitud de registro. `POST /autenticacion/login` entrega un JWT de 15 minutos con el ID y el rol emitido. En cada ruta protegida, la API vuelve a consultar el usuario para aplicar el rol y estado vigentes; una cuenta inactiva no puede iniciar sesión y tampoco puede usar tokens anteriores.
+
+Enviar el token en `Authorization: Bearer <token>`. Las consultas públicas de artesanos, productos y stands no requieren token. La administración de pabellones, sectores, stands, solicitudes, asignaciones y cuentas requiere `ADMINISTRADOR`. Las altas, modificaciones y bajas de productos requieren `ARTESANO`; el propietario se toma de la cuenta autenticada, no del cuerpo de la solicitud. Si aún no existe un administrador, la primera cuenta debe aprovisionarse fuera de la API; luego los administradores pueden crear otras cuentas administrativas.
+
+Una autenticación correcta no otorga permisos automáticamente: los endpoints reservados a otros roles responden `403`. Un login de cuenta inexistente, inactiva o con contraseña incorrecta responde `401` con un mensaje genérico.
+
+Al aprobar una solicitud, la API crea el perfil de artesano y cambia el rol de la cuenta dentro de una misma transacción. Rechazar una solicitud o pedir modificaciones no habilita operaciones de artesano.
 
 ## Ejemplos de cuerpos JSON
 
@@ -83,16 +97,14 @@ Todas las respuestas utilizan formato JSON.
 ### Crear un producto
 
 {
-	"nombre": "Collar artesanal",
-	"descripcion": "Collar realizado en plata",
-	"precio": 25000,
-	"categoria": "Joyería"
+  "nombre": "Collar artesanal",
+  "descripcion": "Collar realizado en plata",
+  "precio": 25000
 }
 
 ## Respuestas de error
 
 - `400 Bad Request`: el ID no es un entero positivo o faltan datos obligatorios.
 - `404 Not Found`: no existe un recurso con el ID indicado.
-- `409 Conflict`: el nombre del pabellón ya existe o no se puede eliminar un pabellón/sector con recursos asociados.
-
-> La ruta de asignación no tiene autorización de administrador mientras la API no implemente autenticación/autorización.
+- `409 Conflict`: el recurso ya existe, una solicitud ya fue resuelta, o no se puede desactivar al último administrador activo.
+- `401 Unauthorized` / `403 Forbidden`: falta una autenticación válida, o la cuenta/rol no tiene acceso al endpoint.
