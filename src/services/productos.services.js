@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.js";
 import { AppError } from "../utils/error.js";
 
-export const obtenerProductosService = async (filtros = {}) => {
+export const obtenerProductosService = async (filtros = {}, propietarioId) => {
   const {
     artesanoId,
     nombre,
@@ -15,7 +15,9 @@ export const obtenerProductosService = async (filtros = {}) => {
 
   const productos = await prisma.producto.findMany({
     where: {
-      ...(artesanoId && { artesanoId }),
+      ...((propietarioId || artesanoId) && {
+        artesanoId: propietarioId || artesanoId,
+      }),
       ...(nombre && { nombre: { contains: nombre, mode: "insensitive" } }),
       ...((precioMin !== undefined || precioMax !== undefined) && {
         precio: {
@@ -41,6 +43,13 @@ export const obtenerProductosService = async (filtros = {}) => {
   return productos;
 };
 
+export const obtenerMisProductosService = async (propietarioId, filtros = {}) => {
+  if (!propietarioId) {
+    throw new AppError("La cuenta no tiene un perfil de artesano habilitado", 409);
+  }
+  return obtenerProductosService(filtros, propietarioId);
+};
+
 export const obtenerProductoPorIdService = async (id) => {
   const producto = await prisma.producto.findUnique({
     where: { id },
@@ -62,16 +71,10 @@ export const obtenerProductoPorIdService = async (id) => {
   return producto;
 };
 
-export const crearProductoService = async (productoDto) => {
-  const { artesanoId, nombre, descripcion, precio } = productoDto;
-
-  // Verificar que el artesano existe antes de asociar el producto
-  const artesanoExistente = await prisma.artesano.findUnique({
-    where: { id: artesanoId },
-  });
-
-  if (!artesanoExistente) {
-    throw new AppError("El artesano especificado no existe", 404);
+export const crearProductoService = async (artesanoId, productoDto) => {
+  const { nombre, descripcion, precio } = productoDto;
+  if (!artesanoId) {
+    throw new AppError("La cuenta no tiene un perfil de artesano habilitado", 409);
   }
 
   const nuevoProducto = await prisma.producto.create({
@@ -86,35 +89,36 @@ export const crearProductoService = async (productoDto) => {
   return nuevoProducto;
 };
 
-export const actualizarProductoService = async (id, datosActualizacion) => {
-  const productoExistente = await prisma.producto.findUnique({
-    where: { id },
-  });
-
-  if (!productoExistente) {
-    throw new AppError("No existe el producto que se intenta actualizar", 404);
+export const actualizarProductoService = async (
+  id,
+  artesanoId,
+  datosActualizacion,
+) => {
+  if (!artesanoId) {
+    throw new AppError("La cuenta no tiene un perfil de artesano habilitado", 409);
   }
-
-  const productoActualizado = await prisma.producto.update({
-    where: { id },
+  const [productoActualizado] = await prisma.producto.updateManyAndReturn({
+    where: { id, artesanoId },
     data: datosActualizacion,
   });
 
+  if (!productoActualizado) {
+    throw new AppError("No se encontró el producto solicitado", 404);
+  }
   return productoActualizado;
 };
 
-export const eliminarProductoService = async (id) => {
-  const productoExistente = await prisma.producto.findUnique({
-    where: { id },
-  });
-
-  if (!productoExistente) {
-    throw new AppError("No existe el producto que se intenta eliminar", 404);
+export const eliminarProductoService = async (id, artesanoId) => {
+  if (!artesanoId) {
+    throw new AppError("La cuenta no tiene un perfil de artesano habilitado", 409);
   }
-
-  await prisma.producto.delete({
-    where: { id },
+  const resultado = await prisma.producto.deleteMany({
+    where: { id, artesanoId },
   });
+
+  if (resultado.count === 0) {
+    throw new AppError("No se encontró el producto solicitado", 404);
+  }
 
   return { mensaje: "Producto eliminado correctamente" };
 };

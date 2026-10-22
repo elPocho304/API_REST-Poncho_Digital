@@ -1,13 +1,6 @@
 import { z } from "zod";
 
 export const crearProductoSchema = z.object({
-  artesanoId: z.uuid({
-    error: (issue) =>
-      issue.input === undefined
-        ? "El ID del artesano es obligatorio"
-        : "El ID del artesano debe ser un UUID válido",
-  }),
-
   nombre: z.string({
     required_error: "El nombre del producto es obligatorio",
   }).min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -20,9 +13,7 @@ export const crearProductoSchema = z.object({
   }).positive("El precio debe ser mayor a 0"),
 });
 
-export const actualizarProductoSchema = crearProductoSchema.partial().omit({
-  artesanoId: true, // No se permite transferir un producto a otro artesano en una edición simple
-});
+export const actualizarProductoSchema = crearProductoSchema.partial();
 
 export const idProductoParamSchema = z.object({
   id: z.uuid({
