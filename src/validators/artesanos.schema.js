@@ -1,34 +1,6 @@
 import { z } from "zod";
 
-
-//esquema para crear un artesano luego de que se apruebe la solicitud
-export const crearArtesanoSchema = z.object({
-  usuarioId: z.uuid({
-    error: (issue) =>
-      issue.input === undefined
-        ? "El ID de usuario es obligatorio"
-        : "El ID de usuario debe ser un UUID válido",
-  }),
-  
-  solicitudId: z.uuid({ error: "El ID de solicitud debe ser un UUID válido" }).optional(),
-  
-  nombreEmprendimiento: z.string({
-    required_error: "El nombre del emprendimiento es obligatorio",
-  }).min(2, "El nombre debe tener al menos 2 caracteres"),
-  
-  rubro: z.string({
-    required_error: "El rubro es obligatorio",
-  }).min(2, "El rubro debe tener al menos 2 caracteres"),
-  
-  localidad: z.string({
-    required_error: "La localidad es obligatoria",
-  }).min(2, "La localidad debe tener al menos 2 caracteres"),
-  
-  trayectoria: z.string().optional(),
-});
-
-
-//reutilizamos crearArtesano con los campos opcionales y bloqueamos la clave foránea
+//Cambiar ya que no existe funcion padre
 export const actualizarArtesanoSchema = crearArtesanoSchema.partial().omit({
   usuarioId: true, // El ID de usuario no debe modificarse una vez vinculado
   solicitudId: true,
@@ -51,6 +23,18 @@ export const artesanoQuerySchema = z.object({
   nombreEmprendimiento: z.string().optional(),
   ordenPor: z
     .enum(["nombreEmprendimiento", "rubro", "localidad", "createdAt"])
+    .default("nombreEmprendimiento"),
+  orden: z.enum(["asc", "desc"]).default("asc"),
+  pagina: z.coerce.number().int().min(1).default(1),
+  limite: z.coerce.number().int().min(1).max(100).default(10),
+});
+
+export const consultarArtesanosSchema = z.object({
+  nombreEmprendimiento: z.string().optional(),
+  rubro: z.string().optional(),
+  localidad: z.string().optional(),
+  ordenPor: z
+    .enum(["nombreEmprendimiento", "rubro", "localidad"])
     .default("nombreEmprendimiento"),
   orden: z.enum(["asc", "desc"]).default("asc"),
   pagina: z.coerce.number().int().min(1).default(1),

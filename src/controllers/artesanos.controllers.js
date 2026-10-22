@@ -28,16 +28,6 @@ export const obtenerArtesanoPorIdController = async (req, res, next) => {
 	}
 };
 
-export const crearArtesanoController = async (req, res, next) => {
-	try{
-		const artesanoDto = req.body;
-		const nuevoArtesano = await crearArtesanoService(artesanoDto);
-		return res.status(201).json(nuevoArtesano);
-	}catch(error){
-		next(error);
-	}
-};
-
 export const actualizarArtesanoController = async (req, res, next) => {
 	try{
 		const {id} = req.params;

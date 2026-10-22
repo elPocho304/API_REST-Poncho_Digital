@@ -39,9 +39,8 @@ Todas las respuestas utilizan formato JSON.
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/` | Verifica que el servicio esté funcionando. |
-| GET | `/artesanos` | Lista todos los artesanos. Acepta filtros `nombre`, `dni`, `localidad`, `descripcion` y `estado`. |
+| GET | `/artesanos` | Lista artesanos. Acepta filtros `nombreEmprendimiento`, `rubro` y `localidad`, orden `ordenPor`/`orden` y paginación `pagina`/`limite` (máximo 100). |
 | GET | `/artesanos/:id` | Obtiene un artesano por ID. |
-| POST | `/artesanos` | Crea un artesano. Requiere `nombre`, `dni`, `localidad` y `estado`. |
 | PUT | `/artesanos/:id` | Actualiza un artesano. Requiere `nombre`, `dni`, `localidad`, `descripcion` y `estado`. |
 | DELETE | `/artesanos/:id` | Elimina un artesano. |
 | GET | `/productos` | Lista todos los productos. Acepta filtros `nombre`, `descripcion`, `precio` y `categoria`. |
@@ -71,17 +70,6 @@ Todas las respuestas utilizan formato JSON.
 | DELETE | `/sectores/eliminar/:id` | Elimina un sector si no tiene stands asociados. |
 
 ## Ejemplos de cuerpos JSON
-
-### Crear un artesano
-
-
-{
-	"nombre": "María González",
-	"dni": "25436789",
-	"localidad": "Córdoba",
-	"descripcion": "Creadora de joyería artesanal",
-	"estado": "activo"
-}
 
 
 ### Crear un producto
