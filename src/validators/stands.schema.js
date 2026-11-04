@@ -16,10 +16,8 @@ export const crearStandSchema = z.object({
     }),
 
   estado: z
-    .enum(["DISPONIBLE", "OCUPADO", "RESERVADO"], {
-      errorMap: () => ({
-        message: "Estado inválido. Debe ser DISPONIBLE, OCUPADO o RESERVADO",
-      }),
+    .never({
+      error: "El estado del stand solo puede modificarse desde asignaciones",
     })
     .optional(),
 });
