@@ -66,12 +66,10 @@ export const iniciarSesionService = async (usuarioDto) => {
   const passwordValida = usuario
     ? await bcrypt.compare(password, usuario.passwordHash)
     : false;
-  if (!usuario || !passwordValida) {
+  if (!usuario || !passwordValida || !usuario.activo) {
     throw new AppError("Credenciales inválidas", 401);
   }
-  if (usuario.activo != true) {
-    throw new AppError("La cuenta está inactiva", 403);
-  }
+
   return {
     id: usuario.id,
     email: usuario.email,
