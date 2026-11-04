@@ -31,7 +31,7 @@ export const crearRegistro = async (registroDto) => {
       data: {
         email: email,
         passwordHash: passwordHash,
-        rol: "PENDIENTE",
+        rol: null,
       },
     });
 
