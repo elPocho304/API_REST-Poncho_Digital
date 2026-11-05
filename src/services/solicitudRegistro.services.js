@@ -133,14 +133,22 @@ export const resolverSolicitudRegistroService = async (
       });
     }
 
-    return tx.solicitudRegistro.update({
-      where: { id },
+    const actualizacion = await tx.solicitudRegistro.updateMany({
+      where: { id, estado: "PENDIENTE" },
       data: {
         estado,
         ...(comentarioAdmin !== undefined && { comentarioAdmin }),
         resueltaPorId: administradorId,
         fechaResolucion: new Date(),
       },
+    });
+
+    if (actualizacion.count === 0) {
+      throw new AppError("La solicitud ya fue resuelta", 409);
+    }
+
+    return tx.solicitudRegistro.findUnique({
+      where: { id },
       include: incluirRelacionesSeguras,
     });
   });

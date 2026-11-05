@@ -49,7 +49,7 @@ export const obtenerStandPorIdService = async (id) => {
 };
 
 export const crearStandService = async (standDto) => {
-  const { numero, sectorId, estado } = standDto;
+  const { numero, sectorId } = standDto;
 
   // Verificar que el sector exista antes de crear el stand
   const sectorExistente = await prisma.sector.findUnique({
@@ -73,7 +73,6 @@ export const crearStandService = async (standDto) => {
     data: {
       numero,
       sectorId,
-      ...(estado && { estado }),
     },
   });
 

@@ -83,7 +83,7 @@ Todas las respuestas utilizan formato JSON.
 
 ## Autenticación y autorización
 
-`POST /autenticacion/registro` crea una cuenta `PENDIENTE` y su solicitud de registro. `POST /autenticacion/login` entrega un JWT de 15 minutos con el ID y el rol emitido. En cada ruta protegida, la API vuelve a consultar el usuario para aplicar el rol y estado vigentes; una cuenta inactiva no puede iniciar sesión y tampoco puede usar tokens anteriores.
+`POST /autenticacion/registro` crea una cuenta sin rol y una solicitud de registro `PENDIENTE`. `POST /autenticacion/login` entrega un JWT de 15 minutos con el ID y el rol emitido. La cuenta no obtiene permisos de artesano hasta que un administrador aprueba la solicitud. En cada ruta protegida, la API vuelve a consultar el usuario para aplicar el rol y estado vigentes; una cuenta inactiva no puede iniciar sesión y tampoco puede usar tokens anteriores.
 
 Enviar el token en `Authorization: Bearer <token>`. Las consultas públicas de artesanos, productos y stands no requieren token. La administración de pabellones, sectores, stands, solicitudes, asignaciones y cuentas requiere `ADMINISTRADOR`. Las altas, modificaciones y bajas de productos requieren `ARTESANO`; el propietario se toma de la cuenta autenticada, no del cuerpo de la solicitud. Si aún no existe un administrador, la primera cuenta debe aprovisionarse fuera de la API; luego los administradores pueden crear otras cuentas administrativas.
 
