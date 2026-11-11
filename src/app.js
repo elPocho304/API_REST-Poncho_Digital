@@ -11,6 +11,8 @@ import usuariosRoutes from "./routes/usuarios.routes.js";
 import "./config/jwt.js";
 import { manejadorErrores } from './middlewares/manejadorErrores.js';
 import { rutaNoEncontrada } from "./middlewares/noEncontrado.js";
+import swaggerUi from "swagger-ui-express";
+import { readFileSync } from "node:fs";
 
 const app = express();
 const PORT = 3000;
@@ -30,7 +32,14 @@ app.use("/solicitudes-registro", solicitudRegistroRoutes);
 app.use("/asignaciones-stand", asignacionesStandRoutes);
 app.use("/usuarios", usuariosRoutes);
 
+const swaggerDocument = JSON.parse(
+readFileSync(new URL("../swagger-output.json", import.meta.url), "utf8"),
+);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.use(rutaNoEncontrada);
+
+
 app.use(manejadorErrores);
 
 app.listen(PORT, () => {
