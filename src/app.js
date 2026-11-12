@@ -18,9 +18,22 @@ const app = express();
 const PORT = 3000;
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get(
+  '/',
+  /*
+  #swagger.tags = ['Estado del servicio']
+  #swagger.summary = 'Verificar disponibilidad de la API'
+  #swagger.description = 'Devuelve un mensaje cuando el servicio está en funcionamiento.'
+  #swagger.security = []
+  #swagger.responses[200] = {
+    description: 'El servicio está disponible.',
+    content: { 'text/html': { schema: { type: 'string', example: 'Bienvenido a la API de Poncho Digital. El servicio está funcionando correctamente.' } } }
+  }
+*/
+  (req, res) => {
   res.send('Bienvenido a la API de Poncho Digital. El servicio está funcionando correctamente.');
-});
+  },
+);
 
 app.use("/productos", productosRoutes);
 app.use("/stands", standsRoutes);
